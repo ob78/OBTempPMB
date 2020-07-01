@@ -1,14 +1,11 @@
 package com.paymybuddy.repository;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.util.HashSet;
 import java.util.Set;
-
-import javax.sql.DataSource;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,7 +16,6 @@ import org.springframework.jdbc.datasource.init.DatabasePopulatorUtils;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 
 import com.paymybuddy.configuration.RepositoryDataSource;
-import com.paymybuddy.configuration.RepositoryJdbcConfiguration;
 import com.paymybuddy.entities.Utilisateur;
 import com.paymybuddy.factory.RepositoryFactory;
 
@@ -43,7 +39,7 @@ public class UtilisateurRepositoryJpaImplTest {
 		
 		// We get a resourceDatabasePopulator
 		resourceDatabasePopulator = new ResourceDatabasePopulator();
-		resourceDatabasePopulator.addScript(new ClassPathResource("/testCleanDB.sql"));
+		resourceDatabasePopulator.addScript(new ClassPathResource("/cleanDBForTests.sql"));
 	}
 	
 	
@@ -112,7 +108,7 @@ public class UtilisateurRepositoryJpaImplTest {
 		utilisateurUpdated.setSolde(456d);
 
 		// ACT
-		utilisateurRepositoryImplUnderTest.update(utilisateurUpdated);;
+		utilisateurRepositoryImplUnderTest.update(utilisateurUpdated);
 
 		// ASSERT
 		assertEquals(utilisateurUpdated.getSolde(),

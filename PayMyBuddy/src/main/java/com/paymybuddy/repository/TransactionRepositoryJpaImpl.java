@@ -118,22 +118,12 @@ public class TransactionRepositoryJpaImpl implements ITransactionRepository {
 			entityManager.close();
 		}
 	}
-	/*
-	public List<Transaction> getAllTransaction() {
-		EntityManager entityManager = entityManagerFactory.createEntityManager();
-		Query query = entityManager.createQuery("SELECT t FROM tranasction t");
-		return query.getResultList();
-	}
-	*/
+
 	@Override
 	public List<Transaction> getTransactions(String emailUtilisateur) {
 		
-		//String QUERY = "SELECT t FROM Transaction t WHERE t.initiateur_email IN ( SELECT email FROM Utilisateur WHERE email = :mail ) ORDER by t.contrepartie_email";
-		//String QUERY = "SELECT t FROM Transaction t WHERE t.initiateur.email IN ( SELECT email FROM Utilisateur WHERE email = :email )";// ORDER by t.contrepartie_email";
-
-		String QUERY = "SELECT t FROM Transaction t WHERE t.initiateur.email IN ( SELECT email FROM Utilisateur WHERE email = :email ) ORDER by t.id DESC";
-		
-		
+		String REQUEST_TRANSACTIONS = "SELECT t FROM Transaction t WHERE t.initiateur.email IN ( SELECT email FROM Utilisateur WHERE email = :email ) ORDER by t.id DESC";
+			
 		List<Transaction> transactions = new ArrayList<>();
 		
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
@@ -143,7 +133,7 @@ public class TransactionRepositoryJpaImpl implements ITransactionRepository {
 		transaction.begin();
 		
 		try {
-			TypedQuery<Transaction> query = entityManager.createQuery(QUERY, Transaction.class);
+			TypedQuery<Transaction> query = entityManager.createQuery(REQUEST_TRANSACTIONS, Transaction.class);
 			
 			transactions = query.setParameter("email", emailUtilisateur).getResultList();
 
@@ -157,5 +147,14 @@ public class TransactionRepositoryJpaImpl implements ITransactionRepository {
 
 		return transactions;
 	}
+
+	// A supprimer
+	/*
+	public List<Transaction> getAllTransaction() {
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+		Query query = entityManager.createQuery("SELECT t FROM tranasction t");
+		return query.getResultList();
+	}
+	*/
 	
 }

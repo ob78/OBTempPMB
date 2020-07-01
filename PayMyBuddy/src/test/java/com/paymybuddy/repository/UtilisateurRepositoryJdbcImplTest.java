@@ -40,7 +40,7 @@ public class UtilisateurRepositoryJdbcImplTest {
 
 		// We get a resourceDatabasePopulator
 		resourceDatabasePopulator = new ResourceDatabasePopulator();
-		resourceDatabasePopulator.addScript(new ClassPathResource("/testCleanDB.sql"));
+		resourceDatabasePopulator.addScript(new ClassPathResource("/cleanDBForTests.sql"));
 	}
 	
 	
@@ -104,7 +104,7 @@ public class UtilisateurRepositoryJdbcImplTest {
 		utilisateurUpdated.setSolde(456d);
 
 		// ACT
-		utilisateurRepositoryImplUnderTest.update(utilisateurUpdated);;
+		utilisateurRepositoryImplUnderTest.update(utilisateurUpdated);
 
 		// ASSERT
 		assertEquals(utilisateurUpdated, utilisateurRepositoryImplUnderTest.read(utilisateurToUpdate.getEmail()));
@@ -148,9 +148,9 @@ public class UtilisateurRepositoryJdbcImplTest {
 		utilisateurConnectionToRead.setSolde(456d);
 		utilisateurRepositoryImplUnderTest.create(utilisateurConnectionToRead);
 
-		Set<Utilisateur> connectionsToGet = new HashSet<>();
-		connectionsToGet.add(utilisateurConnectionToRead);
-		utilisateurToRead.setConnection(connectionsToGet);
+		Set<Utilisateur> connectionsToRead = new HashSet<>();
+		connectionsToRead.add(utilisateurConnectionToRead);
+		utilisateurToRead.setConnection(connectionsToRead);
 		
 		utilisateurRepositoryImplUnderTest.addConnection(utilisateurToRead, utilisateurConnectionToRead);
 

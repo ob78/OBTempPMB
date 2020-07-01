@@ -45,7 +45,7 @@ public class UtilisateurRepositoryJdbcUpdateAllImplTest {
 		*/
 		// We get a resourceDatabasePopulator
 		resourceDatabasePopulator = new ResourceDatabasePopulator();
-		resourceDatabasePopulator.addScript(new ClassPathResource("/testCleanDB.sql"));
+		resourceDatabasePopulator.addScript(new ClassPathResource("/cleanDBForTests.sql"));
 	}
 	
 	

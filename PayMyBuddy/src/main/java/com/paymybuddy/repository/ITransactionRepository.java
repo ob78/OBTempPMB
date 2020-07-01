@@ -14,5 +14,5 @@ public interface ITransactionRepository {
 
 	public void delete(long idTransaction);
 
-	public List<Transaction> getTransactions (String emailUtilisateur);
+	public List<Transaction> getTransactions (String email);
 }

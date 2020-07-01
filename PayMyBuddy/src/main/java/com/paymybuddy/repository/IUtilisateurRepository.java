@@ -14,5 +14,6 @@ public interface IUtilisateurRepository {
 
 	public void addConnection(Utilisateur utilisateur, Utilisateur connection);
 	
+	// A supprimer
 	public void updateAll(Utilisateur utilisateur);
 }
