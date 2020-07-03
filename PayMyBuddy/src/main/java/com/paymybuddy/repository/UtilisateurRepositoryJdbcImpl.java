@@ -13,6 +13,9 @@ import org.slf4j.LoggerFactory;
 import com.paymybuddy.configuration.RepositoryJdbcConfiguration;
 import com.paymybuddy.entities.Utilisateur;
 
+/**
+ * Class managing the data persistence for the user.
+ */
 public class UtilisateurRepositoryJdbcImpl implements IUtilisateurRepository {
 
 	private static final Logger logger = LoggerFactory.getLogger(UtilisateurRepositoryJdbcImpl.class);
@@ -23,6 +26,11 @@ public class UtilisateurRepositoryJdbcImpl implements IUtilisateurRepository {
 		this.repositoryConfiguration = repositoryConfiguration;
 	}
 
+	/**
+	 * Add a user in the repository.
+	 * 
+	 * @param Utilisateur The user to add
+	 */
 	@Override
 	public void create(Utilisateur utilisateur) {
 
@@ -45,6 +53,11 @@ public class UtilisateurRepositoryJdbcImpl implements IUtilisateurRepository {
 		}
 	}
 
+	/**
+	 * Update a user in the repository.
+	 * 
+	 * @param Utilisateur The user to update
+	 */
 	@Override
 	public void update(Utilisateur utilisateur) {
 
@@ -67,6 +80,13 @@ public class UtilisateurRepositoryJdbcImpl implements IUtilisateurRepository {
 		}
 	}
 
+	/**
+	 * Read a user from the repository.
+	 * 
+	 * @param email The email of the user to read
+	 * 
+	 * @return The user read
+	 */
 	@Override
 	public Utilisateur read(String email) {
 
@@ -134,8 +154,13 @@ public class UtilisateurRepositoryJdbcImpl implements IUtilisateurRepository {
 			}
 		}
 	}
-
+	
 	//With transaction
+	/**
+	 * Delete a user from the repository.
+	 * 
+	 * @param email The email of the user to delete
+	 */
 	@Override
 	public void delete(String email) {
 
@@ -190,7 +215,14 @@ public class UtilisateurRepositoryJdbcImpl implements IUtilisateurRepository {
 		}
 
 	}
-	
+
+	/**
+	 * Add a connection in the repository.
+	 * 
+	 * @param utilisateur The user for which to add a connection
+	 * 
+	 * @param connection  The connection to be added to the user
+	 */
 	@Override
 	public void addConnection(Utilisateur utilisateur, Utilisateur connection) {
 

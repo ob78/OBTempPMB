@@ -16,6 +16,9 @@ import com.paymybuddy.entities.Transaction;
 import com.paymybuddy.entities.Utilisateur;
 import com.paymybuddy.factory.RepositoryFactory;
 
+/**
+ * Class managing the data persistence for the financial transaction.
+ */
 public class TransactionRepositoryJdbcImpl implements ITransactionRepository {
 
 	private static final Logger logger = LoggerFactory.getLogger(TransactionRepositoryJdbcImpl.class);
@@ -27,9 +30,17 @@ public class TransactionRepositoryJdbcImpl implements ITransactionRepository {
 	}
 
 	String propertiesFilePath = "paymybuddy.properties";
-		
-	IUtilisateurRepository utilisateurRepository = RepositoryFactory.getUtilisateurRepository("jdbc", propertiesFilePath);
-	
+
+	IUtilisateurRepository utilisateurRepository = RepositoryFactory.getUtilisateurRepository("jdbc",
+			propertiesFilePath);
+
+	/**
+	 * Add a financial transaction in the repository.
+	 * 
+	 * @param Transaction The financial transaction to add
+	 * 
+	 * @return The financial transaction added
+	 */
 	@Override
 	public Transaction create(Transaction transaction) {
 
@@ -72,6 +83,11 @@ public class TransactionRepositoryJdbcImpl implements ITransactionRepository {
 
 	}
 
+	/**
+	 * Update a financial transaction in the repository.
+	 * 
+	 * @param Transaction The financial transaction to update
+	 */
 	@Override
 	public void update(Transaction transaction) {
 
@@ -96,6 +112,13 @@ public class TransactionRepositoryJdbcImpl implements ITransactionRepository {
 		}
 	}
 
+	/**
+	 * Read a financial transaction from the repository.
+	 * 
+	 * @param idTransaction The id of the financial transaction to read
+	 * 
+	 * @return The financial transaction read
+	 */
 	@Override
 	public Transaction read(long idTransaction) {
 
@@ -112,8 +135,6 @@ public class TransactionRepositoryJdbcImpl implements ITransactionRepository {
 			if (rs.next()) {
 				transaction = new Transaction();
 				transaction.setIdTransaction(rs.getLong("id_transaction"));
-
-				//IUtilisateurRepository utilisateurRepository = new UtilisateurRepositoryJdbcImpl(repositoryConfiguration);
 
 				Utilisateur initiateur = utilisateurRepository.read(rs.getString("initiateur_email"));
 				Utilisateur contrepartie = utilisateurRepository.read(rs.getString("contrepartie_email"));
@@ -140,9 +161,13 @@ public class TransactionRepositoryJdbcImpl implements ITransactionRepository {
 				}
 			}
 		}
-
 	}
 
+	/**
+	 * Delete a financial transaction from the repository.
+	 * 
+	 * @param idTransaction The id of the financial transaction to delete
+	 */
 	@Override
 	public void delete(long idTransaction) {
 
@@ -197,13 +222,20 @@ public class TransactionRepositoryJdbcImpl implements ITransactionRepository {
 		}
 	}
 
+	/**
+	 * Return all financial transactions performed by the user having this email.
+	 * 
+	 * @param email The email of the user to get financial transactions
+	 * 
+	 * @return The list of all financial transactions for the user
+	 */
 	@Override
 	public List<Transaction> getTransactions(String emailUtilisateur) {
 
 		final String REQUEST_TRANSACTIONS = "SELECT * from transaction WHERE initiateur_email IN ( SELECT email FROM utilisateur WHERE email = ?) ORDER BY id_transaction DESC ;";
 
 		List<Transaction> transactions = new ArrayList<>();
-		
+
 		ResultSet rs = null;
 		try (Connection postgreCon = repositoryConfiguration.getConnection();
 				PreparedStatement ps = postgreCon.prepareStatement(REQUEST_TRANSACTIONS)) {
@@ -215,8 +247,6 @@ public class TransactionRepositoryJdbcImpl implements ITransactionRepository {
 				Transaction transaction = new Transaction();
 				transaction.setIdTransaction(rs.getLong("id_transaction"));
 
-				//IUtilisateurRepository utilisateurRepository = new UtilisateurRepositoryJdbcImpl(repositoryConfiguration);
-
 				Utilisateur initiateur = utilisateurRepository.read(rs.getString("initiateur_email"));
 				Utilisateur contrepartie = utilisateurRepository.read(rs.getString("contrepartie_email"));
 
@@ -224,9 +254,9 @@ public class TransactionRepositoryJdbcImpl implements ITransactionRepository {
 				transaction.setContrepartie(contrepartie);
 				transaction.setMontant(rs.getDouble("montant"));
 				transaction.setCommentaire(rs.getString("commentaire"));
-			
+
 				transactions.add(transaction);
-			} 
+			}
 
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -241,10 +271,7 @@ public class TransactionRepositoryJdbcImpl implements ITransactionRepository {
 				}
 			}
 		}
-		
-		
-		
 		return transactions;
 	}
-	
+
 }
