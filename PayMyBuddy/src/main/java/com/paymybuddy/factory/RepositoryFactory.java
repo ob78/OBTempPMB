@@ -11,8 +11,10 @@ import com.paymybuddy.repository.ITransactionRepository;
 import com.paymybuddy.repository.IUtilisateurRepository;
 import com.paymybuddy.repository.TransactionRepositoryJdbcImpl;
 import com.paymybuddy.repository.TransactionRepositoryJpaImpl;
+import com.paymybuddy.repository.TransactionRepositoryJpaImpl2;
 import com.paymybuddy.repository.UtilisateurRepositoryJdbcImpl;
 import com.paymybuddy.repository.UtilisateurRepositoryJpaImpl;
+import com.paymybuddy.repository.UtilisateurRepositoryJpaImpl2;
 
 public class RepositoryFactory {
 
@@ -67,7 +69,7 @@ public class RepositoryFactory {
 		
 		}
 
-		else if (repositoryName.equals("jdbc")) {
+		else if (repositoryName.equals("jpa")) {
 
 			EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory(properties);
 

@@ -1,5 +1,7 @@
 package com.paymybuddy.entities;
 
+import java.io.Serializable;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -15,12 +17,17 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name="transaction")
-public class Transaction {
+public class Transaction implements Serializable {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "postgre_sequence")
 	@SequenceGenerator(name="postgre_sequence", sequenceName = "transaction_id_seq", allocationSize = 1)
-	@Column(name="id_Transaction")
+	@Column(name="id_transaction")
 	private long idTransaction;
 	
 	//@Column(name="initiateur", nullable=false)
