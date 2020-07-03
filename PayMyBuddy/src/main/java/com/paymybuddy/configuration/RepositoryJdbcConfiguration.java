@@ -10,6 +10,10 @@ import java.util.Properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Class in charge of managing the configuration of the JDBC connection to the
+ * database
+ */
 public class RepositoryJdbcConfiguration {
 
 	private static final Logger logger = LoggerFactory.getLogger(RepositoryJdbcConfiguration.class);
@@ -30,6 +34,15 @@ public class RepositoryJdbcConfiguration {
 
 	private static RepositoryJdbcConfiguration repositoryConfiguration = null;
 
+	/**
+	 * Return an instance of a JDBC repository configuration if it does not already
+	 * exist.
+	 * 
+	 * @param propertiesFilePath The path and filename to the file containing
+	 *                           properties for the connection to the database
+	 * 
+	 * @return An instance of a JDBC repository configuration
+	 */
 	public static RepositoryJdbcConfiguration getRepositoryConfiguration(String propertiesFilePath) {
 		if (repositoryConfiguration == null) {
 			repositoryConfiguration = getRepositoryConfigurationInstance(propertiesFilePath);
@@ -66,6 +79,11 @@ public class RepositoryJdbcConfiguration {
 		return repositoryConfigurationInstance;
 	}
 
+	/**
+	 * Return a JDBC connection to the database.
+	 * 
+	 * @return A connection to the database
+	 */
 	public Connection getConnection() {
 		try {
 			return DriverManager.getConnection(url, username, password);
