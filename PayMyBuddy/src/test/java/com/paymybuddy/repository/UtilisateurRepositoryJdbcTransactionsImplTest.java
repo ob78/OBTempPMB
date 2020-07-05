@@ -1,5 +1,6 @@
 package com.paymybuddy.repository;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -7,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,12 +20,14 @@ import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import com.paymybuddy.configuration.RepositoryDataSource;
 import com.paymybuddy.entities.Utilisateur;
 import com.paymybuddy.factory.RepositoryFactory;
+import com.paymybuddy.repositorytransactionsmanager.RepositoryTransactionsManagerJDBCImpl;
 
+public class UtilisateurRepositoryJdbcTransactionsImplTest {
 
-public class UtilisateurRepositoryJpaImplTest {
+	private static String propertiesFilePathTest = "paymybuddyTest.properties";
 
-	private static String persistence = "persistencePostgreTest";
-
+	private static RepositoryTransactionsManagerJDBCImpl repositoryManager;
+	
 	private static ResourceDatabasePopulator resourceDatabasePopulator;
 	
 	private static DriverManagerDataSource dataSource;
@@ -35,18 +39,28 @@ public class UtilisateurRepositoryJpaImplTest {
 		// We get a dataSource
 		dataSource = RepositoryDataSource.getDataSource("org.postgresql.Driver",
 				"jdbc:postgresql://localhost/PayMyBuddyTest", "postgres", "admin");
-		
+
 		// We get a resourceDatabasePopulator
 		resourceDatabasePopulator = new ResourceDatabasePopulator();
 		resourceDatabasePopulator.addScript(new ClassPathResource("/cleanDBForTests.sql"));
 	}
-	
+		
 	@BeforeEach
 	private void setUpPerTest() {
 		// We clear the database
 		DatabasePopulatorUtils.execute(resourceDatabasePopulator, dataSource);
 
-		utilisateurRepositoryImplUnderTest = RepositoryFactory.getUtilisateurRepository("jpa", persistence);
+		repositoryManager = RepositoryTransactionsManagerJDBCImpl.getRepositoryManagerJDBCImpl(propertiesFilePathTest);
+		
+		utilisateurRepositoryImplUnderTest = RepositoryFactory.getUtilisateurRepository(repositoryManager);
+
+		repositoryManager.getConnection();
+		
+	}
+	
+	@AfterEach
+	private void afterPerTest() {
+		repositoryManager.closeCurrentConnection();
 	}
 		
 	@Test
@@ -56,21 +70,17 @@ public class UtilisateurRepositoryJpaImplTest {
 		utilisateurToCreate.setEmail("abc@test.com");
 		utilisateurToCreate.setPassword("abc");
 		utilisateurToCreate.setSolde(123d);
-		
+				
 		// ACT
 		utilisateurRepositoryImplUnderTest.create(utilisateurToCreate);
-		//Utilisateur Test = utilisateurRepositoryImplUnderTest.read(utilisateurToCreate.getEmail());
+		repositoryManager.commitTransaction();
 		
 		// ASSERT
 		assertNotNull(utilisateurRepositoryImplUnderTest.read(utilisateurToCreate.getEmail()));
-		assertEquals(utilisateurToCreate.getEmail(),
-				utilisateurRepositoryImplUnderTest.read(utilisateurToCreate.getEmail()).getEmail());
-		assertEquals(utilisateurToCreate.getPassword(),
-				utilisateurRepositoryImplUnderTest.read(utilisateurToCreate.getEmail()).getPassword());
-		assertEquals(utilisateurToCreate.getSolde(),
-				utilisateurRepositoryImplUnderTest.read(utilisateurToCreate.getEmail()).getSolde());
+		assertEquals(utilisateurToCreate,
+				utilisateurRepositoryImplUnderTest.read(utilisateurToCreate.getEmail()));
 	
-		//assertThat(utilisateurRepositoryImplUnderTest.read(utilisateurToCreate.getEmail())).isEqualTo(utilisateurToCreate);
+		assertThat(utilisateurRepositoryImplUnderTest.read(utilisateurToCreate.getEmail())).isEqualTo(utilisateurToCreate);
 	}
 	
 	@Test
@@ -85,7 +95,8 @@ public class UtilisateurRepositoryJpaImplTest {
 
 		// ACT
 		utilisateurRepositoryImplUnderTest.delete(utilisateurToDelete.getEmail());
-
+		repositoryManager.commitTransaction();
+		
 		// ASSERT
 		assertNull(utilisateurRepositoryImplUnderTest.read(utilisateurToDelete.getEmail()));
 	}
@@ -107,20 +118,15 @@ public class UtilisateurRepositoryJpaImplTest {
 
 		// ACT
 		utilisateurRepositoryImplUnderTest.update(utilisateurUpdated);
-
+		repositoryManager.commitTransaction();
+		
 		// ASSERT
-		assertEquals(utilisateurUpdated.getSolde(),
-				utilisateurRepositoryImplUnderTest.read(utilisateurToUpdate.getEmail()).getSolde());
-		assertEquals(utilisateurUpdated.getEmail(),
-				utilisateurRepositoryImplUnderTest.read(utilisateurToUpdate.getEmail()).getEmail());
-		assertEquals(utilisateurUpdated.getPassword(),
-				utilisateurRepositoryImplUnderTest.read(utilisateurToUpdate.getEmail()).getPassword());
-			
-		//assertEquals(utilisateurUpdated, utilisateurRepositoryImplUnderTest.read(utilisateurToUpdate.getEmail()));
+		assertEquals(utilisateurUpdated, utilisateurRepositoryImplUnderTest.read(utilisateurToUpdate.getEmail()));
 	
-		// assertThat(utilisateurRepositoryImplUnderTest.read(utilisateurToUpdate.getEmail())).isEqualTo(utilisateurUpdated);
-}
+		assertThat(utilisateurRepositoryImplUnderTest.read(utilisateurToUpdate.getEmail())).isEqualTo(utilisateurUpdated);
 
+	}
+	
 	@Test
 	public void readUtilisateur_whenUtilisateurExist_whenUtilisateurHasNoConnection() {
 		// ARRANGE
@@ -130,17 +136,16 @@ public class UtilisateurRepositoryJpaImplTest {
 		utilisateurToRead.setSolde(123d);
 
 		utilisateurRepositoryImplUnderTest.create(utilisateurToRead);
-
+		repositoryManager.commitTransaction();
+		
 		// ACT
 		Utilisateur utilisateurRead = utilisateurRepositoryImplUnderTest.read(utilisateurToRead.getEmail());
 
 		// ASSERT
 		assertNotNull(utilisateurRead);
-		assertEquals(utilisateurToRead.getEmail(), utilisateurRead.getEmail());
-		assertEquals(utilisateurToRead.getPassword(), utilisateurRead.getPassword());
-		assertEquals(utilisateurToRead.getSolde(), utilisateurRead.getSolde());
+		assertEquals(utilisateurToRead, utilisateurRead);
 		
-		//assertThat(utilisateurGet).isEqualTo(utilisateurToGet);
+		assertThat(utilisateurRead).isEqualTo(utilisateurToRead);
 	}
 	
 	@Test
@@ -166,18 +171,13 @@ public class UtilisateurRepositoryJpaImplTest {
 
 		// ACT
 		Utilisateur utilisateurRead = utilisateurRepositoryImplUnderTest.read(utilisateurToRead.getEmail());
-
+		repositoryManager.commitTransaction();
+		
 		// ASSERT
 		assertNotNull(utilisateurRead);
-		assertEquals(utilisateurToRead.getEmail(), utilisateurRead.getEmail());
-		assertEquals(utilisateurToRead.getPassword(), utilisateurRead.getPassword());
-		assertEquals(utilisateurToRead.getSolde(), utilisateurRead.getSolde());
+		assertEquals(utilisateurToRead, utilisateurRead);
 		
-		Set<Utilisateur> connectionsRead = utilisateurRead.getConnection();
-		Utilisateur utilisateurConnectionRead =  connectionsRead.iterator().next();
-		assertEquals(utilisateurConnectionToRead.getEmail(), utilisateurConnectionRead.getEmail());
-		assertEquals(utilisateurConnectionToRead.getPassword(), utilisateurConnectionRead.getPassword());
-		assertEquals(utilisateurConnectionToRead.getSolde(), utilisateurConnectionRead.getSolde());
+		assertThat(utilisateurRead).isEqualTo(utilisateurToRead);
 	}
 	
 	@Test
@@ -185,7 +185,7 @@ public class UtilisateurRepositoryJpaImplTest {
 		// ACT & ASSERT
 		assertNull(utilisateurRepositoryImplUnderTest.read("UtilisateurNotExist"));
 	}
-
+	
 	@Test
 	public void addAConnection_whenNoExistingConnection() {
 		// ARRANGE
@@ -202,24 +202,22 @@ public class UtilisateurRepositoryJpaImplTest {
 		utilisateurNewConnection.setSolde(456d);
 
 		utilisateurRepositoryImplUnderTest.create(utilisateurNewConnection);
-			
+		
 		Set<Utilisateur> connections = new HashSet<>();
 		connections.add(utilisateurNewConnection);
 		utilisateurToAddConnection.setConnection(connections);
 		
 		// ACT
 		utilisateurRepositoryImplUnderTest.addConnection(utilisateurToAddConnection, utilisateurNewConnection);
-
+		repositoryManager.commitTransaction();
+		
 		// ASSERT
-		Utilisateur utilisateurConnectionAdded = utilisateurRepositoryImplUnderTest.read(utilisateurToAddConnection.getEmail());
-		Set<Utilisateur> connectionsUtilisateur = utilisateurConnectionAdded.getConnection();
-		Utilisateur connectionAdded =  connectionsUtilisateur.iterator().next();
-		
-		assertEquals(utilisateurNewConnection.getEmail(), connectionAdded.getEmail());
-		assertEquals(utilisateurNewConnection.getPassword(), connectionAdded.getPassword());
-		assertEquals(utilisateurNewConnection.getSolde(), connectionAdded.getSolde());
+		assertEquals(utilisateurToAddConnection, utilisateurRepositoryImplUnderTest.read(utilisateurToAddConnection.getEmail()));
+	
+		assertThat(utilisateurRepositoryImplUnderTest.read(utilisateurToAddConnection.getEmail())).isEqualTo(utilisateurToAddConnection);
+
 	}
-		
+	
 	@Test
 	public void addAConnection_whenExistingConnection() {
 		// ARRANGE
@@ -255,22 +253,15 @@ public class UtilisateurRepositoryJpaImplTest {
 		
 		// ACT
 		utilisateurRepositoryImplUnderTest.addConnection(utilisateurToAddConnection, utilisateurNewConnection);   ;
-
-		// ASSERT
-		Utilisateur utilisateurConnectionAdded = utilisateurRepositoryImplUnderTest.read(utilisateurToAddConnection.getEmail());
-		Set<Utilisateur> connectionsUtilisateur = utilisateurConnectionAdded.getConnection();
-		Utilisateur connectionAdded = null;
-		for (Utilisateur connection : connectionsUtilisateur ) {
-			if ( connection.getEmail().equals(utilisateurNewConnection.getEmail()) ){
-				connectionAdded = connection;
-			}
-		}
+		repositoryManager.commitTransaction();
 		
-		assertEquals(utilisateurNewConnection.getEmail(), connectionAdded.getEmail());
-		assertEquals(utilisateurNewConnection.getPassword(), connectionAdded.getPassword());
-		assertEquals(utilisateurNewConnection.getSolde(), connectionAdded.getSolde());
-	}
+		// ASSERT
+		assertEquals(utilisateurToAddConnection, utilisateurRepositoryImplUnderTest.read(utilisateurToAddConnection.getEmail()));
+	
+		assertThat(utilisateurRepositoryImplUnderTest.read(utilisateurToAddConnection.getEmail())).isEqualTo(utilisateurToAddConnection);
 
+	}
+	
 	@Test
 	public void addAConnection_whenConnectionAlreadyExisting() {
 		// ARRANGE
@@ -296,17 +287,13 @@ public class UtilisateurRepositoryJpaImplTest {
 
 		// ACT
 		utilisateurRepositoryImplUnderTest.addConnection(utilisateurToAddConnection, utilisateurExistingConnection);
-
+		repositoryManager.commitTransaction();
+		
 		// ASSERT
-		Utilisateur utilisateurConnectionAdded = utilisateurRepositoryImplUnderTest.read(utilisateurToAddConnection.getEmail());
-		Set<Utilisateur> connectionsUtilisateur = utilisateurConnectionAdded.getConnection();
-		Utilisateur connectionAdded =  connectionsUtilisateur.iterator().next();
-		//examples.stream().findFirst().get()
-		
-		assertEquals(1,connectionsUtilisateur.size());
-		
-		assertEquals(utilisateurExistingConnection.getEmail(), connectionAdded.getEmail());
-		assertEquals(utilisateurExistingConnection.getPassword(), connectionAdded.getPassword());
-		assertEquals(utilisateurExistingConnection.getSolde(), connectionAdded.getSolde());
+		assertEquals(utilisateurToAddConnection, utilisateurRepositoryImplUnderTest.read(utilisateurToAddConnection.getEmail()));
+	
+		assertThat(utilisateurRepositoryImplUnderTest.read(utilisateurToAddConnection.getEmail())).isEqualTo(utilisateurToAddConnection);
+
 	}
+	
 }

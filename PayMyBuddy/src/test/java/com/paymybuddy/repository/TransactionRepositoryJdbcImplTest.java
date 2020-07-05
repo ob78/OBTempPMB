@@ -41,7 +41,7 @@ public class TransactionRepositoryJdbcImplTest {
 
 		// We get a resourceDatabasePopulator
 		resourceDatabasePopulator = new ResourceDatabasePopulator();
-		resourceDatabasePopulator.addScript(new ClassPathResource("/cleanDBForTests.sql"));
+		resourceDatabasePopulator.addScript(new ClassPathResource("/dataTransactionsForTests.sql"));
 	}
 
 	@BeforeEach
@@ -57,9 +57,6 @@ public class TransactionRepositoryJdbcImplTest {
 	@Test
 	public void createTransaction() {
 		// ARRANGE
-		resourceDatabasePopulator.addScript(new ClassPathResource("/dataTransactionsForTests.sql"));
-		DatabasePopulatorUtils.execute(resourceDatabasePopulator, dataSource);
-
 		Utilisateur initiateur = utilisateurRepositoryImplUnderTest.read("abc@test.com");
 		Utilisateur contrepartie = utilisateurRepositoryImplUnderTest.read("def@test.com");
 
@@ -82,9 +79,6 @@ public class TransactionRepositoryJdbcImplTest {
 	@Test
 	public void deleteTransaction() {
 		// ARRANGE
-		resourceDatabasePopulator.addScript(new ClassPathResource("/dataTransactionsForTests.sql"));
-		DatabasePopulatorUtils.execute(resourceDatabasePopulator, dataSource);
-
 		Utilisateur initiateur = utilisateurRepositoryImplUnderTest.read("abc@test.com");
 		Utilisateur contrepartie = utilisateurRepositoryImplUnderTest.read("def@test.com");
 
@@ -106,9 +100,6 @@ public class TransactionRepositoryJdbcImplTest {
 	@Test
 	public void updateTransaction() {
 		// ARRANGE
-		resourceDatabasePopulator.addScript(new ClassPathResource("/dataTransactionsForTests.sql"));
-		DatabasePopulatorUtils.execute(resourceDatabasePopulator, dataSource);
-
 		Utilisateur initiateur = utilisateurRepositoryImplUnderTest.read("abc@test.com");
 		Utilisateur contrepartie = utilisateurRepositoryImplUnderTest.read("def@test.com");
 
@@ -138,9 +129,6 @@ public class TransactionRepositoryJdbcImplTest {
 	@Test
 	public void readTransaction_whenTransactionExist() {
 		// ARRANGE
-		resourceDatabasePopulator.addScript(new ClassPathResource("/dataTransactionsForTests.sql"));
-		DatabasePopulatorUtils.execute(resourceDatabasePopulator, dataSource);
-
 		Utilisateur initiateur = utilisateurRepositoryImplUnderTest.read("abc@test.com");
 		Utilisateur contrepartie = utilisateurRepositoryImplUnderTest.read("def@test.com");
 
@@ -171,9 +159,6 @@ public class TransactionRepositoryJdbcImplTest {
 	@Test
 	public void getAllTransactions() {
 		// ARRANGE
-		resourceDatabasePopulator.addScript(new ClassPathResource("/dataTransactionsForTests.sql"));
-		DatabasePopulatorUtils.execute(resourceDatabasePopulator, dataSource);
-
 		Transaction transactionToGet1 = new Transaction();
 		Utilisateur initiateur1 = utilisateurRepositoryImplUnderTest.read("abc@test.com");
 		Utilisateur contrepartie1 = utilisateurRepositoryImplUnderTest.read("def@test.com");

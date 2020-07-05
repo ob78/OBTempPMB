@@ -11,8 +11,9 @@ import com.paymybuddy.entities.Utilisateur;
 import com.paymybuddy.factory.RepositoryFactory;
 import com.paymybuddy.factory.SessionFactoryPayMyBuddy;
 import com.paymybuddy.repository.IUtilisateurRepository;
+import com.paymybuddy.repository.UtilisateurRepositoryJpaImpl2;
 
-public class MainTestTransactionale {
+public class MainTestTransactionaleHibernate {
 
 	public static void main(String[] args) {
 
@@ -31,7 +32,7 @@ public class MainTestTransactionale {
 		String persistence = "persistencePostgreProd";
 		
 		//IUtilisateurRepository utilisateurRepository = RepositoryFactory.getUtilisateurRepository("jdbc", propertiesFilePath);
-		IUtilisateurRepository utilisateurRepository = RepositoryFactory.getUtilisateurRepository("jpa", persistence);
+		UtilisateurRepositoryJpaImpl2 utilisateurRepository = (UtilisateurRepositoryJpaImpl2) RepositoryFactory.getUtilisateurRepository("jpa", persistence);
 		
 		
 		// Test insertion d'un utilisateur COMMIT JPA
@@ -40,7 +41,28 @@ public class MainTestTransactionale {
 		utilisateurToInsertJPACOMMIT.setEmail("abc@policier.com");
 		utilisateurToInsertJPACOMMIT.setPassword("ac");
 		utilisateurToInsertJPACOMMIT.setSolde(123d);
-				
+
+		
+		try {
+	    	utilisateurRepository.openCurrentSessionwithTransaction();
+	    	utilisateurRepository.create(utilisateurToInsertJPACOMMIT);
+	    	
+	    	utilisateurRepository.delete(utilisateurToInsertJPACOMMIT.getEmail());
+	    	
+	    	utilisateurToInsertJPACOMMIT.setSolde(456d);
+	    	
+	    	utilisateurRepository.update(utilisateurToInsertJPACOMMIT);
+	    	
+	    	utilisateurRepository.commitAndCloseCurrentSessionwithTransaction();
+	    	
+	    	System.out.print("Trnsaction commited");
+		}
+		catch (Exception e){
+			utilisateurRepository.rollbackAndCloseCurrentSessionwithTransaction();
+			
+			System.out.print("Trnsaction rollbackeded");
+		}
+/*
 		//EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory(persistence);
 				
 		//EntityManager entityManager = entityManagerFactory.createEntityManager();
@@ -71,7 +93,7 @@ public class MainTestTransactionale {
 			currentSession.close();
 		}
 		
-		
+*/		
 		
 	}
 

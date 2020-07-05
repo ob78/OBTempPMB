@@ -10,11 +10,15 @@ import com.paymybuddy.configuration.RepositoryJdbcConfiguration;
 import com.paymybuddy.repository.ITransactionRepository;
 import com.paymybuddy.repository.IUtilisateurRepository;
 import com.paymybuddy.repository.TransactionRepositoryJdbcImpl;
+import com.paymybuddy.repository.TransactionRepositoryJdbcTransactionsImpl;
+import com.paymybuddy.repository.TransactionRepositoryJpaHibernateImpl;
 import com.paymybuddy.repository.TransactionRepositoryJpaImpl;
-import com.paymybuddy.repository.TransactionRepositoryJpaImpl2;
 import com.paymybuddy.repository.UtilisateurRepositoryJdbcImpl;
+import com.paymybuddy.repository.UtilisateurRepositoryJdbcTransactionsImpl;
+import com.paymybuddy.repository.UtilisateurRepositoryJpaHibernateImpl;
 import com.paymybuddy.repository.UtilisateurRepositoryJpaImpl;
-import com.paymybuddy.repository.UtilisateurRepositoryJpaImpl2;
+import com.paymybuddy.repositorytransactionsmanager.RepositoryTransactionsManagerHibernateImpl;
+import com.paymybuddy.repositorytransactionsmanager.RepositoryTransactionsManagerJDBCImpl;
 
 public class RepositoryFactory {
 
@@ -22,6 +26,7 @@ public class RepositoryFactory {
 	
 	private static ITransactionRepository transactionRepository = null;
 
+	// Repository TRANSACTION - Factory paramétrée - Sans gestion des transactions -> JDBC & JPA
 	public static ITransactionRepository getTransactionRepository(String repositoryName, String properties) {
 
 		if (repositoryName.equals("jdbc")) {
@@ -54,8 +59,32 @@ public class RepositoryFactory {
 		return transactionRepository;
 	}
 
+	
+	// Repository TRANSACTION - Factory non paramétrée - Avec gestion des transactions -> HIBERNATE
+	public static ITransactionRepository getTransactionRepository(RepositoryTransactionsManagerHibernateImpl repositoryManger) {
+
+			transactionRepository = new TransactionRepositoryJpaHibernateImpl(repositoryManger);
+
+			logger.info("Factory : Creation JPA Transaction Repository OK");
+				
+			return transactionRepository;
+	}
+	
+	// Repository TRANSACTION - Factory non paramétrée - Avec gestion des transactions -> JDBC
+	public static ITransactionRepository getTransactionRepository(RepositoryTransactionsManagerJDBCImpl repositoryManger) {
+				
+			transactionRepository = new TransactionRepositoryJdbcTransactionsImpl(repositoryManger);
+
+			logger.info("Factory : Creation JDBC Transaction Repository OK");
+	
+			return transactionRepository;
+	}
+			
+			
+	
 	private static IUtilisateurRepository utilisateurRepository = null;
 
+	// Repository UTILISATEUR - Factory paramétrée - Sans gestion des transactions -> JDBC & JPA
 	public static IUtilisateurRepository getUtilisateurRepository(String repositoryName, String properties) {
 
 		if (repositoryName.equals("jdbc")) {
@@ -91,5 +120,28 @@ public class RepositoryFactory {
 		
 		return utilisateurRepository;
 	}
+	
+	
+	
+	// Repository UTILISATEUR - Factory non paramétrée - Avec gestion des transactions -> HIBERNATE
+	public static IUtilisateurRepository getUtilisateurRepository(RepositoryTransactionsManagerHibernateImpl repositoryManger) {
 
+		utilisateurRepository = new UtilisateurRepositoryJpaHibernateImpl(repositoryManger);
+
+		logger.info("Factory : Creation JPA Utilisateur Repository OK");
+		
+
+		return utilisateurRepository;
+	}
+
+	// Repository UTILISATEUR - Factory non paramétrée - Avec gestion des transactions -> JDBC
+	public static IUtilisateurRepository getUtilisateurRepository(RepositoryTransactionsManagerJDBCImpl repositoryManger) {
+			
+		utilisateurRepository = new UtilisateurRepositoryJdbcTransactionsImpl(repositoryManger);
+
+		logger.info("Factory : Creation JDBC Utilisateur Repository OK");
+
+		return utilisateurRepository;
+	}
+	
 }

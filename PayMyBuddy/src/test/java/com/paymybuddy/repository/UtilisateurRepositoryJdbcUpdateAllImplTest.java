@@ -2,8 +2,6 @@ package com.paymybuddy.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -19,8 +17,6 @@ import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import com.paymybuddy.configuration.RepositoryDataSource;
 import com.paymybuddy.entities.Utilisateur;
 import com.paymybuddy.factory.RepositoryFactory;
-
-
 
 public class UtilisateurRepositoryJdbcUpdateAllImplTest {
 

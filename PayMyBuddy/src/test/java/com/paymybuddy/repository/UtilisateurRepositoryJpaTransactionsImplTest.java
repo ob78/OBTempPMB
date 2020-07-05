@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,12 +19,16 @@ import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import com.paymybuddy.configuration.RepositoryDataSource;
 import com.paymybuddy.entities.Utilisateur;
 import com.paymybuddy.factory.RepositoryFactory;
+import com.paymybuddy.repositorytransactionsmanager.RepositoryTransactionsManagerHibernateImpl;
 
 
-public class UtilisateurRepositoryJpaImplTest {
 
-	private static String persistence = "persistencePostgreTest";
+public class UtilisateurRepositoryJpaTransactionsImplTest {
 
+	private static String persistence = "hibernate.cfg.xml";
+	
+	private static RepositoryTransactionsManagerHibernateImpl repositoryManager;
+	
 	private static ResourceDatabasePopulator resourceDatabasePopulator;
 	
 	private static DriverManagerDataSource dataSource;
@@ -41,14 +46,27 @@ public class UtilisateurRepositoryJpaImplTest {
 		resourceDatabasePopulator.addScript(new ClassPathResource("/cleanDBForTests.sql"));
 	}
 	
+	
 	@BeforeEach
 	private void setUpPerTest() {
 		// We clear the database
 		DatabasePopulatorUtils.execute(resourceDatabasePopulator, dataSource);
 
-		utilisateurRepositoryImplUnderTest = RepositoryFactory.getUtilisateurRepository("jpa", persistence);
+		repositoryManager = RepositoryTransactionsManagerHibernateImpl.getRepositoryManagerHibernateImpl(persistence);
+		
+		utilisateurRepositoryImplUnderTest = RepositoryFactory.getUtilisateurRepository(repositoryManager);
+	
+		repositoryManager.openCurrentSessionWithTransaction();
 	}
 		
+	@AfterEach
+	private void afterPerTest() {
+		//repositoryManager.commitTransaction();
+		
+		repositoryManager.closeCurrentSession();
+
+	}
+	
 	@Test
 	public void createUtilisateur() {
 		// ARRANGE
@@ -59,6 +77,8 @@ public class UtilisateurRepositoryJpaImplTest {
 		
 		// ACT
 		utilisateurRepositoryImplUnderTest.create(utilisateurToCreate);
+		
+		//repositoryManager.commitTransaction();
 		//Utilisateur Test = utilisateurRepositoryImplUnderTest.read(utilisateurToCreate.getEmail());
 		
 		// ASSERT
@@ -85,7 +105,8 @@ public class UtilisateurRepositoryJpaImplTest {
 
 		// ACT
 		utilisateurRepositoryImplUnderTest.delete(utilisateurToDelete.getEmail());
-
+		repositoryManager.commitTransaction();
+		
 		// ASSERT
 		assertNull(utilisateurRepositoryImplUnderTest.read(utilisateurToDelete.getEmail()));
 	}
@@ -107,7 +128,8 @@ public class UtilisateurRepositoryJpaImplTest {
 
 		// ACT
 		utilisateurRepositoryImplUnderTest.update(utilisateurUpdated);
-
+		repositoryManager.commitTransaction();
+		
 		// ASSERT
 		assertEquals(utilisateurUpdated.getSolde(),
 				utilisateurRepositoryImplUnderTest.read(utilisateurToUpdate.getEmail()).getSolde());
@@ -130,7 +152,8 @@ public class UtilisateurRepositoryJpaImplTest {
 		utilisateurToRead.setSolde(123d);
 
 		utilisateurRepositoryImplUnderTest.create(utilisateurToRead);
-
+		repositoryManager.commitTransaction();
+		
 		// ACT
 		Utilisateur utilisateurRead = utilisateurRepositoryImplUnderTest.read(utilisateurToRead.getEmail());
 
@@ -166,7 +189,8 @@ public class UtilisateurRepositoryJpaImplTest {
 
 		// ACT
 		Utilisateur utilisateurRead = utilisateurRepositoryImplUnderTest.read(utilisateurToRead.getEmail());
-
+		repositoryManager.commitTransaction();
+		
 		// ASSERT
 		assertNotNull(utilisateurRead);
 		assertEquals(utilisateurToRead.getEmail(), utilisateurRead.getEmail());
@@ -209,7 +233,8 @@ public class UtilisateurRepositoryJpaImplTest {
 		
 		// ACT
 		utilisateurRepositoryImplUnderTest.addConnection(utilisateurToAddConnection, utilisateurNewConnection);
-
+		repositoryManager.commitTransaction();
+		
 		// ASSERT
 		Utilisateur utilisateurConnectionAdded = utilisateurRepositoryImplUnderTest.read(utilisateurToAddConnection.getEmail());
 		Set<Utilisateur> connectionsUtilisateur = utilisateurConnectionAdded.getConnection();
@@ -255,7 +280,8 @@ public class UtilisateurRepositoryJpaImplTest {
 		
 		// ACT
 		utilisateurRepositoryImplUnderTest.addConnection(utilisateurToAddConnection, utilisateurNewConnection);   ;
-
+		repositoryManager.commitTransaction();
+		
 		// ASSERT
 		Utilisateur utilisateurConnectionAdded = utilisateurRepositoryImplUnderTest.read(utilisateurToAddConnection.getEmail());
 		Set<Utilisateur> connectionsUtilisateur = utilisateurConnectionAdded.getConnection();
@@ -296,7 +322,8 @@ public class UtilisateurRepositoryJpaImplTest {
 
 		// ACT
 		utilisateurRepositoryImplUnderTest.addConnection(utilisateurToAddConnection, utilisateurExistingConnection);
-
+		repositoryManager.commitTransaction();
+		
 		// ASSERT
 		Utilisateur utilisateurConnectionAdded = utilisateurRepositoryImplUnderTest.read(utilisateurToAddConnection.getEmail());
 		Set<Utilisateur> connectionsUtilisateur = utilisateurConnectionAdded.getConnection();
@@ -309,4 +336,5 @@ public class UtilisateurRepositoryJpaImplTest {
 		assertEquals(utilisateurExistingConnection.getPassword(), connectionAdded.getPassword());
 		assertEquals(utilisateurExistingConnection.getSolde(), connectionAdded.getSolde());
 	}
+
 }

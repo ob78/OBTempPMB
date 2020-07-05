@@ -20,8 +20,6 @@ import com.paymybuddy.configuration.RepositoryDataSource;
 import com.paymybuddy.entities.Utilisateur;
 import com.paymybuddy.factory.RepositoryFactory;
 
-
-
 public class UtilisateurRepositoryJdbcImplTest {
 
 	private static String propertiesFilePathTest = "paymybuddyTest.properties";
@@ -42,8 +40,7 @@ public class UtilisateurRepositoryJdbcImplTest {
 		resourceDatabasePopulator = new ResourceDatabasePopulator();
 		resourceDatabasePopulator.addScript(new ClassPathResource("/cleanDBForTests.sql"));
 	}
-	
-	
+		
 	@BeforeEach
 	private void setUpPerTest() {
 		// We clear the database
