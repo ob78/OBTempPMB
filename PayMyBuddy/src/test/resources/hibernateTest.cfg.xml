@@ -13,7 +13,7 @@
 		</property>
  -->
 		<!-- Database connection settings -->
-		<property name="connection.url">jdbc:postgresql://localhost/PayMyBuddyProd</property> <!-- BD Mane -->
+		<property name="connection.url">jdbc:postgresql://localhost/PayMyBuddyTest</property> <!-- BD Mane -->
 		<property name="connection.driver_class">org.postgresql.Driver</property> <!-- DB Driver -->
 		<property name="connection.username">postgres</property> <!-- DB User -->
 		<property name="connection.password">admin</property> <!-- DB Password -->

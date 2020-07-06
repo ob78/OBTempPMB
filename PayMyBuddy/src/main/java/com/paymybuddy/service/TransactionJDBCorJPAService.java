@@ -13,9 +13,9 @@ import com.paymybuddy.factory.RepositoryFactory;
 import com.paymybuddy.repository.ITransactionRepository;
 import com.paymybuddy.repository.IUtilisateurRepository;
 
-public class TransactionService {
+public class TransactionJDBCorJPAService {
 
-	private static final Logger logger = LoggerFactory.getLogger(TransactionService.class);
+	private static final Logger logger = LoggerFactory.getLogger(TransactionJDBCorJPAService.class);
 
 	String propertiesFilePath = "paymybuddy.properties";
 

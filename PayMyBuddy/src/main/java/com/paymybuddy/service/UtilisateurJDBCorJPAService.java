@@ -10,9 +10,9 @@ import com.paymybuddy.entities.Utilisateur;
 import com.paymybuddy.factory.RepositoryFactory;
 import com.paymybuddy.repository.IUtilisateurRepository;
 
-public class UtilisateurService {
+public class UtilisateurJDBCorJPAService {
 
-	private static final Logger logger = LoggerFactory.getLogger(UtilisateurService.class);
+	private static final Logger logger = LoggerFactory.getLogger(UtilisateurJDBCorJPAService.class);
 
 	String propertiesFilePath = "paymybuddy.properties";
 
