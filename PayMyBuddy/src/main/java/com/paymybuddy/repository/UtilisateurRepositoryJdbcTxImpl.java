@@ -11,19 +11,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.paymybuddy.entities.Utilisateur;
-import com.paymybuddy.repositorytransactionsmanager.RepositoryTransactionsManagerJDBCImpl;
+import com.paymybuddy.repositorytransactionsmanager.RepositoryTxManagerJDBC;
 
 /**
  * Class managing the data persistence for the user.
  */
-public class UtilisateurRepositoryJdbcTransactionsImpl implements IUtilisateurRepository {
+public class UtilisateurRepositoryJdbcTxImpl implements IUtilisateurRepository {
 
-	private static final Logger logger = LoggerFactory.getLogger(UtilisateurRepositoryJdbcTransactionsImpl.class);
+	private static final Logger logger = LoggerFactory.getLogger(UtilisateurRepositoryJdbcTxImpl.class);
 
-	private RepositoryTransactionsManagerJDBCImpl repositoryManager = null;
+	private RepositoryTxManagerJDBC repositoryTxManager = null;
 
-	public UtilisateurRepositoryJdbcTransactionsImpl(RepositoryTransactionsManagerJDBCImpl repositoryManager) {
-		this.repositoryManager = repositoryManager;
+	public UtilisateurRepositoryJdbcTxImpl(RepositoryTxManagerJDBC repositoryTxManager) {
+		this.repositoryTxManager = repositoryTxManager;
 	}
 	
 	/**
@@ -36,7 +36,7 @@ public class UtilisateurRepositoryJdbcTransactionsImpl implements IUtilisateurRe
 
 		final String REQUEST_CREATE = "INSERT INTO utilisateur (email, password, solde) VALUES (?,?,?)";
 		
-		Connection postgreCon = repositoryManager.getConnection();
+		Connection postgreCon = repositoryTxManager.getConnection();
 		try (
 			PreparedStatement ps = postgreCon.prepareStatement(REQUEST_CREATE)) {
 
@@ -64,7 +64,7 @@ public class UtilisateurRepositoryJdbcTransactionsImpl implements IUtilisateurRe
 
 		final String REQUEST_UPDATE = "UPDATE utilisateur SET password=?, solde=? WHERE email=?";
 
-		Connection postgreCon = repositoryManager.getConnection();
+		Connection postgreCon = repositoryTxManager.getConnection();
 		try (
 			PreparedStatement psUtilisateur = postgreCon.prepareStatement(REQUEST_UPDATE);) {
 			psUtilisateur.setString(1, utilisateur.getPassword());
@@ -101,7 +101,7 @@ public class UtilisateurRepositoryJdbcTransactionsImpl implements IUtilisateurRe
 		ResultSet rsUtilisateur = null;
 		ResultSet rsConnections = null;
 		
-		Connection postgreCon = repositoryManager.getConnection();
+		Connection postgreCon = repositoryTxManager.getConnection();
 		try (
 			PreparedStatement psUtilisateur = postgreCon.prepareStatement(REQUEST_READ_UTILISATEUR);
 			PreparedStatement psConnections = postgreCon.prepareStatement(REQUEST_READ_CONNECTIONS);) {
@@ -173,7 +173,7 @@ public class UtilisateurRepositoryJdbcTransactionsImpl implements IUtilisateurRe
 		Connection postgreCon = null;
 		PreparedStatement ps = null;
 		try {
-			postgreCon = repositoryManager.getConnection();
+			postgreCon = repositoryTxManager.getConnection();
 /*
 			boolean auto = postgreCon.getAutoCommit();
 			postgreCon.setAutoCommit(false);
@@ -224,7 +224,7 @@ public class UtilisateurRepositoryJdbcTransactionsImpl implements IUtilisateurRe
 
 		final String REQUEST_CREATE = "INSERT INTO utilisateur_connection (utilisateur_email, utilisateur_connection_email) VALUES(?,?)";
 
-		Connection postgreCon = repositoryManager.getConnection();
+		Connection postgreCon = repositoryTxManager.getConnection();
 		try (
 			PreparedStatement ps = postgreCon.prepareStatement(REQUEST_CREATE)) {
 
@@ -250,7 +250,7 @@ public class UtilisateurRepositoryJdbcTransactionsImpl implements IUtilisateurRe
 
 		final String REQUEST_UPDATE_CONNECTIONS = "INSERT INTO utilisateur_connection ( utilisateur_email, utilisateur_connection_email ) VALUES (?,?)";
 		
-		Connection postgreCon = repositoryManager.getConnection();
+		Connection postgreCon = repositoryTxManager.getConnection();
 		try (
 			PreparedStatement psUtilisateur = postgreCon.prepareStatement(REQUEST_UPDATE_UTILISATEUR);
 			PreparedStatement psConnections = postgreCon.prepareStatement(REQUEST_UPDATE_CONNECTIONS);

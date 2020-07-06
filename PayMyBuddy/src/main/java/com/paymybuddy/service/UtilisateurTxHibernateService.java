@@ -9,26 +9,26 @@ import org.slf4j.LoggerFactory;
 import com.paymybuddy.entities.Utilisateur;
 import com.paymybuddy.factory.RepositoryFactory;
 import com.paymybuddy.repository.IUtilisateurRepository;
-import com.paymybuddy.repositorytransactionsmanager.RepositoryTransactionsManagerHibernateImpl;
+import com.paymybuddy.repositorytransactionsmanager.RepositoryTxManagerHibernate;
 
 public class UtilisateurTxHibernateService {
 
 	private static final Logger logger = LoggerFactory.getLogger(UtilisateurTxHibernateService.class);
 
-	private static String persistence = "hibernate.cfg.xml";
+	private static String hibernateConfigurationFile = "hibernate.cfg.xml";
 
-	private RepositoryTransactionsManagerHibernateImpl repositoryTransactionsManager = RepositoryTransactionsManagerHibernateImpl
-			.getRepositoryManagerHibernateImpl(persistence);
+	private RepositoryTxManagerHibernate repositoryTxManager = RepositoryTxManagerHibernate
+			.getRepositoryManagerHibernateImpl(hibernateConfigurationFile);
 
 	private IUtilisateurRepository utilisateurRepository = RepositoryFactory
-			.getUtilisateurRepository(repositoryTransactionsManager);
+			.getUtilisateurRepository(repositoryTxManager);
 
 	public boolean registerToApplication(String email, String password) {
 
 		boolean utilisateurRegistered = false;
 
 		try {
-			repositoryTransactionsManager.openCurrentSessionWithTransaction();
+			repositoryTxManager.openCurrentSessionWithTx();
 
 			if (utilisateurRepository.read(email) != null) {
 				logger.error("Registration : Utilisateur {} already exist", email);
@@ -40,7 +40,7 @@ public class UtilisateurTxHibernateService {
 
 				utilisateurRepository.create(utilisateurToCreate);
 
-				repositoryTransactionsManager.commitTransaction();
+				repositoryTxManager.commitTx();
 
 				logger.info("Registration : Utilisateur {} registered", email);
 
@@ -50,11 +50,11 @@ public class UtilisateurTxHibernateService {
 		} catch (Exception e) {
 			logger.error("Registration : Error in Utilisateur {} registration", email);
 
-			repositoryTransactionsManager.rollbackTransaction();
+			repositoryTxManager.rollbackTx();
 		} finally {
 			logger.error("Closing current session");
 
-			repositoryTransactionsManager.closeCurrentSession();
+			repositoryTxManager.closeCurrentSession();
 		}
 
 		return utilisateurRegistered;
@@ -65,14 +65,14 @@ public class UtilisateurTxHibernateService {
 		boolean utilisateurConnected = false;
 
 		try {
-			repositoryTransactionsManager.openCurrentSessionWithTransaction();
+			repositoryTxManager.openCurrentSessionWithTx();
 
 			if (utilisateurRepository.read(email) == null) {
 				logger.error("Connection : Utilisateur {} does not exist", email);
 			} else if (!utilisateurRepository.read(email).getPassword().equals(password)) {
 				logger.error("Connection : Utilisateur {} wrong password", email);
 			} else {
-				repositoryTransactionsManager.commitTransaction();
+				repositoryTxManager.commitTx();
 
 				logger.info("Connection : Utilisateur {} connected", email);
 
@@ -81,11 +81,11 @@ public class UtilisateurTxHibernateService {
 		} catch (Exception e) {
 			logger.error("Connection : Error in Utilisateur {} connection", email);
 
-			repositoryTransactionsManager.rollbackTransaction();
+			repositoryTxManager.rollbackTx();
 		} finally {
 			logger.error("Closing current session");
 
-			repositoryTransactionsManager.closeCurrentSession();
+			repositoryTxManager.closeCurrentSession();
 		}
 
 		return utilisateurConnected;
@@ -97,7 +97,7 @@ public class UtilisateurTxHibernateService {
 		boolean wireToAccountDone = false;
 
 		try {
-			repositoryTransactionsManager.openCurrentSessionWithTransaction();
+			repositoryTxManager.openCurrentSessionWithTx();
 
 			Utilisateur utilisateurToUpdate = utilisateurRepository.read(email);
 			if (utilisateurToUpdate == null) {
@@ -112,20 +112,20 @@ public class UtilisateurTxHibernateService {
 
 				utilisateurRepository.update(utilisateurToUpdate);
 
-				repositoryTransactionsManager.commitTransaction();
+				repositoryTxManager.commitTx();
 
-				logger.info("Wire to account : Utilisateur {} done", email);
+				logger.info("Wire to account by Utilisateur {} for Amount {} : done", email, amount);
 
 				wireToAccountDone = true;
 			}
 		} catch (Exception e) {
 			logger.error("Wire to account : Error in Utilisateur {} wire to account", email);
 
-			repositoryTransactionsManager.rollbackTransaction();
+			repositoryTxManager.rollbackTx();
 		} finally {
 			logger.error("Closing current session");
 
-			repositoryTransactionsManager.closeCurrentSession();
+			repositoryTxManager.closeCurrentSession();
 		}
 
 		return wireToAccountDone;
@@ -136,7 +136,7 @@ public class UtilisateurTxHibernateService {
 		boolean withdrawalFromAccountDone = false;
 
 		try {
-			repositoryTransactionsManager.openCurrentSessionWithTransaction();
+			repositoryTxManager.openCurrentSessionWithTx();
 
 			Utilisateur utilisateurToUpdate = utilisateurRepository.read(email);
 			if (utilisateurToUpdate == null) {
@@ -146,7 +146,8 @@ public class UtilisateurTxHibernateService {
 				Double oldSolde = utilisateurToUpdate.getSolde();
 
 				if (oldSolde < amount) {
-					logger.error("Withdrawal from account : Utilisateur {} solde not sufficient", email);
+					logger.error("Withdrawal from account : Utilisateur {} solde = {} not sufficient for amount = {}",
+							email, oldSolde, amount);
 				} else {
 					Double newSolde = oldSolde - amount;
 
@@ -154,9 +155,9 @@ public class UtilisateurTxHibernateService {
 
 					utilisateurRepository.update(utilisateurToUpdate);
 
-					repositoryTransactionsManager.commitTransaction();
+					repositoryTxManager.commitTx();
 
-					logger.info("Withdrawal from account : Utilisateur {} done", email);
+					logger.info("Withdrawal from account by Utilisateur {} for Amount = {} done", email, amount);
 
 					withdrawalFromAccountDone = true;
 				}
@@ -164,11 +165,11 @@ public class UtilisateurTxHibernateService {
 		} catch (Exception e) {
 			logger.error("Withdrawal from account : Error in Utilisateur {} withdrawal from account", email);
 
-			repositoryTransactionsManager.rollbackTransaction();
+			repositoryTxManager.rollbackTx();
 		} finally {
 			logger.error("Closing current session");
 
-			repositoryTransactionsManager.closeCurrentSession();
+			repositoryTxManager.closeCurrentSession();
 		}
 
 		return withdrawalFromAccountDone;
@@ -179,45 +180,46 @@ public class UtilisateurTxHibernateService {
 		boolean connectionAdded = false;
 
 		try {
-			repositoryTransactionsManager.openCurrentSessionWithTransaction();
+			repositoryTxManager.openCurrentSessionWithTx();
 
 			Utilisateur utilisateurToAddConnection = utilisateurRepository.read(utilisateurEmail);
 			Utilisateur newConnection = utilisateurRepository.read(connectionEmail);
 
 			if (utilisateurToAddConnection == null) {
-				logger.error("Add a conection : Utilisateur {} does not exist", utilisateurEmail);
+				logger.error("Add a connection : Utilisateur {} does not exist", utilisateurEmail);
 			} else if (newConnection == null) {
-				logger.error("Add a conection", connectionEmail);
+				logger.error("Add a connection : Connection {} does not exist", connectionEmail);
 			} else if (utilisateurEmail.equals(connectionEmail)) {
-				logger.error("Add a conection : Utilisateur {} same as connection to add", utilisateurEmail);
+				logger.error("Add a connection : Utilisateur {} same as connection to add", utilisateurEmail);
 			} else {
-				// Utilisateur utilisateur = utilisateurRepository.read(utilisateurEmail);
 				Set<Utilisateur> utilisateurConnections = new HashSet<>();
 				utilisateurConnections = utilisateurToAddConnection.getConnection();
 
 				if (utilisateurConnections.contains(newConnection)) {
-					logger.error("Add a conection : Utilisateur {} connection already exist", utilisateurEmail);
+					logger.error("Add a conection : Utilisateur {} has already Connection {}", utilisateurEmail,
+							connectionEmail);
 				} else {
 					utilisateurConnections.add(newConnection);
 					utilisateurToAddConnection.setConnection(utilisateurConnections);
 					utilisateurRepository.addConnection(utilisateurToAddConnection, newConnection);
 					// utilisateurRepository.update(utilisateur);
 
-					repositoryTransactionsManager.commitTransaction();
+					repositoryTxManager.commitTx();
 
-					logger.info("Add a conection : Utilisateur {} connection added", utilisateurEmail);
+					logger.info("Add a conection : Utilisateur {} Connection {} added", utilisateurEmail,
+							connectionEmail);
 
 					connectionAdded = true;
 				}
 			}
 		} catch (Exception e) {
-			logger.error("Add a conection : Error in Utilisateur {} add conection", utilisateurEmail);
+			logger.error("Add a connection : Error in Utilisateur {} add connection", utilisateurEmail);
 
-			repositoryTransactionsManager.rollbackTransaction();
+			repositoryTxManager.rollbackTx();
 		} finally {
 			logger.error("Closing current session");
 
-			repositoryTransactionsManager.closeCurrentSession();
+			repositoryTxManager.closeCurrentSession();
 		}
 
 		return connectionAdded;

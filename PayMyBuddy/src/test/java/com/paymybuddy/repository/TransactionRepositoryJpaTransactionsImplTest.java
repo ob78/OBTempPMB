@@ -21,13 +21,13 @@ import com.paymybuddy.configuration.RepositoryDataSource;
 import com.paymybuddy.entities.Transaction;
 import com.paymybuddy.entities.Utilisateur;
 import com.paymybuddy.factory.RepositoryFactory;
-import com.paymybuddy.repositorytransactionsmanager.RepositoryTransactionsManagerHibernateImpl;
+import com.paymybuddy.repositorytransactionsmanager.RepositoryTxManagerHibernate;
 
 public class TransactionRepositoryJpaTransactionsImplTest {
 
 	private static String hibernateConfigFile = "src/test/resources/hibernateTest.cfg.xml";
 	
-	private static RepositoryTransactionsManagerHibernateImpl repositoryTransactionsManager;
+	private static RepositoryTxManagerHibernate repositoryTransactionsManager;
 
 	private static ResourceDatabasePopulator resourceDatabasePopulator;
 
@@ -53,13 +53,13 @@ public class TransactionRepositoryJpaTransactionsImplTest {
 		// We clear the database
 		DatabasePopulatorUtils.execute(resourceDatabasePopulator, dataSource);
 
-		repositoryTransactionsManager = RepositoryTransactionsManagerHibernateImpl.getRepositoryManagerHibernateImpl(hibernateConfigFile);
+		repositoryTransactionsManager = RepositoryTxManagerHibernate.getRepositoryManagerHibernateImpl(hibernateConfigFile);
 				
 		transactionRepositoryImplUnderTest = RepositoryFactory.getTransactionRepository(repositoryTransactionsManager);
 
 		utilisateurRepositoryImplUnderTest = RepositoryFactory.getUtilisateurRepository(repositoryTransactionsManager);
 	
-		repositoryTransactionsManager.openCurrentSessionWithTransaction();
+		repositoryTransactionsManager.openCurrentSessionWithTx();
 	}
 
 	@AfterEach
@@ -82,7 +82,7 @@ public class TransactionRepositoryJpaTransactionsImplTest {
 		// ACT
 		Transaction transactionCreated = transactionRepositoryImplUnderTest.create(transactionToCreate);
 
-		repositoryTransactionsManager.commitTransaction();
+		repositoryTransactionsManager.commitTx();
 		
 		// ASSERT
 		assertNotNull(transactionRepositoryImplUnderTest.read(transactionCreated.getIdTransaction()));
@@ -108,7 +108,7 @@ public class TransactionRepositoryJpaTransactionsImplTest {
 		// ACT
 		transactionRepositoryImplUnderTest.delete(transactionDeleted.getIdTransaction());
 
-		repositoryTransactionsManager.commitTransaction();
+		repositoryTransactionsManager.commitTx();
 		
 		// ASSERT
 		assertNull(transactionRepositoryImplUnderTest.read(transactionDeleted.getIdTransaction()));
@@ -133,7 +133,7 @@ public class TransactionRepositoryJpaTransactionsImplTest {
 		// ACT
 		transactionRepositoryImplUnderTest.update(transactionToUpdate);
 
-		repositoryTransactionsManager.commitTransaction();
+		repositoryTransactionsManager.commitTx();
 		
 		// ASSERT
 		Transaction transactionUdpated = transactionRepositoryImplUnderTest
@@ -162,7 +162,7 @@ public class TransactionRepositoryJpaTransactionsImplTest {
 		// ACT
 		Transaction transactionRead = transactionRepositoryImplUnderTest.read(transactionToRead.getIdTransaction());
 
-		repositoryTransactionsManager.commitTransaction();
+		repositoryTransactionsManager.commitTx();
 		
 		// ASSERT
 		assertNotNull(transactionRead);
@@ -205,7 +205,7 @@ public class TransactionRepositoryJpaTransactionsImplTest {
 		List<Transaction> transactionsGet = new ArrayList<>();
 		transactionsGet = transactionRepositoryImplUnderTest.getTransactions("abc@test.com");
 
-		repositoryTransactionsManager.commitTransaction();
+		repositoryTransactionsManager.commitTx();
 		
 		// ASSERT
 		assertNotNull(transactionsGet);

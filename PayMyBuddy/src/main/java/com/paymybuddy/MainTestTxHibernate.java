@@ -11,9 +11,9 @@ import com.paymybuddy.entities.Utilisateur;
 import com.paymybuddy.factory.RepositoryFactory;
 import com.paymybuddy.repository.ITransactionRepository;
 import com.paymybuddy.repository.IUtilisateurRepository;
-import com.paymybuddy.repositorytransactionsmanager.RepositoryTransactionsManagerHibernateImpl;
+import com.paymybuddy.repositorytransactionsmanager.RepositoryTxManagerHibernate;
 
-public class MainTestTransactionHibernate {
+public class MainTestTxHibernate {
 
 
 
@@ -21,7 +21,7 @@ public class MainTestTransactionHibernate {
 
 		 String persistence = "hibernate.cfg.xml";
 		
-		 RepositoryTransactionsManagerHibernateImpl repositoryManager;
+		 RepositoryTxManagerHibernate repositoryManager;
 
 		 ResourceDatabasePopulator resourceDatabasePopulator;
 
@@ -46,13 +46,13 @@ public class MainTestTransactionHibernate {
 		// We clear the database
 		DatabasePopulatorUtils.execute(resourceDatabasePopulator, dataSource);
 
-		repositoryManager = RepositoryTransactionsManagerHibernateImpl.getRepositoryManagerHibernateImpl(persistence);
+		repositoryManager = RepositoryTxManagerHibernate.getRepositoryManagerHibernateImpl(persistence);
 		
 		transactionRepositoryImplUnderTest = RepositoryFactory.getTransactionRepository(repositoryManager);
 
 		utilisateurRepositoryImplUnderTest = RepositoryFactory.getUtilisateurRepository(repositoryManager);
 
-		repositoryManager.openCurrentSessionWithTransaction();
+		repositoryManager.openCurrentSessionWithTx();
 
 
 		// ARRANGE
@@ -82,11 +82,11 @@ public class MainTestTransactionHibernate {
 		testUtilisateur.setSolde(333d);
 		//utilisateurRepositoryImplUnderTest.create(testUtilisateur);
 		
-		repositoryManager.commitTransaction();
+		repositoryManager.commitTx();
 		
 		} catch (Exception e) {
 			System.out.println("Error -> Rollback "+ e);
-			repositoryManager.rollbackTransaction();
+			repositoryManager.rollbackTx();
 		}
 				
 		repositoryManager.closeCurrentSession();

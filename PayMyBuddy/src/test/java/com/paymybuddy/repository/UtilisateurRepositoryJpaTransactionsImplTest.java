@@ -19,7 +19,7 @@ import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import com.paymybuddy.configuration.RepositoryDataSource;
 import com.paymybuddy.entities.Utilisateur;
 import com.paymybuddy.factory.RepositoryFactory;
-import com.paymybuddy.repositorytransactionsmanager.RepositoryTransactionsManagerHibernateImpl;
+import com.paymybuddy.repositorytransactionsmanager.RepositoryTxManagerHibernate;
 
 
 
@@ -27,7 +27,7 @@ public class UtilisateurRepositoryJpaTransactionsImplTest {
 
 	private static String hibernateConfigFile = "src/test/resources/hibernateTest.cfg.xml";
 	
-	private static RepositoryTransactionsManagerHibernateImpl repositoryTransactionsManager;
+	private static RepositoryTxManagerHibernate repositoryTransactionsManager;
 	
 	private static ResourceDatabasePopulator resourceDatabasePopulator;
 	
@@ -52,11 +52,11 @@ public class UtilisateurRepositoryJpaTransactionsImplTest {
 		// We clear the database
 		DatabasePopulatorUtils.execute(resourceDatabasePopulator, dataSource);
 
-		repositoryTransactionsManager = RepositoryTransactionsManagerHibernateImpl.getRepositoryManagerHibernateImpl(hibernateConfigFile);
+		repositoryTransactionsManager = RepositoryTxManagerHibernate.getRepositoryManagerHibernateImpl(hibernateConfigFile);
 		
 		utilisateurRepositoryImplUnderTest = RepositoryFactory.getUtilisateurRepository(repositoryTransactionsManager);
 	
-		repositoryTransactionsManager.openCurrentSessionWithTransaction();
+		repositoryTransactionsManager.openCurrentSessionWithTx();
 	}
 		
 	@AfterEach
@@ -105,7 +105,7 @@ public class UtilisateurRepositoryJpaTransactionsImplTest {
 
 		// ACT
 		utilisateurRepositoryImplUnderTest.delete(utilisateurToDelete.getEmail());
-		repositoryTransactionsManager.commitTransaction();
+		repositoryTransactionsManager.commitTx();
 		
 		// ASSERT
 		assertNull(utilisateurRepositoryImplUnderTest.read(utilisateurToDelete.getEmail()));
@@ -128,7 +128,7 @@ public class UtilisateurRepositoryJpaTransactionsImplTest {
 
 		// ACT
 		utilisateurRepositoryImplUnderTest.update(utilisateurUpdated);
-		repositoryTransactionsManager.commitTransaction();
+		repositoryTransactionsManager.commitTx();
 		
 		// ASSERT
 		assertEquals(utilisateurUpdated.getSolde(),
@@ -152,7 +152,7 @@ public class UtilisateurRepositoryJpaTransactionsImplTest {
 		utilisateurToRead.setSolde(123d);
 
 		utilisateurRepositoryImplUnderTest.create(utilisateurToRead);
-		repositoryTransactionsManager.commitTransaction();
+		repositoryTransactionsManager.commitTx();
 		
 		// ACT
 		Utilisateur utilisateurRead = utilisateurRepositoryImplUnderTest.read(utilisateurToRead.getEmail());
@@ -189,7 +189,7 @@ public class UtilisateurRepositoryJpaTransactionsImplTest {
 
 		// ACT
 		Utilisateur utilisateurRead = utilisateurRepositoryImplUnderTest.read(utilisateurToRead.getEmail());
-		repositoryTransactionsManager.commitTransaction();
+		repositoryTransactionsManager.commitTx();
 		
 		// ASSERT
 		assertNotNull(utilisateurRead);
@@ -233,7 +233,7 @@ public class UtilisateurRepositoryJpaTransactionsImplTest {
 		
 		// ACT
 		utilisateurRepositoryImplUnderTest.addConnection(utilisateurToAddConnection, utilisateurNewConnection);
-		repositoryTransactionsManager.commitTransaction();
+		repositoryTransactionsManager.commitTx();
 		
 		// ASSERT
 		Utilisateur utilisateurConnectionAdded = utilisateurRepositoryImplUnderTest.read(utilisateurToAddConnection.getEmail());
@@ -280,7 +280,7 @@ public class UtilisateurRepositoryJpaTransactionsImplTest {
 		
 		// ACT
 		utilisateurRepositoryImplUnderTest.addConnection(utilisateurToAddConnection, utilisateurNewConnection);   ;
-		repositoryTransactionsManager.commitTransaction();
+		repositoryTransactionsManager.commitTx();
 		
 		// ASSERT
 		Utilisateur utilisateurConnectionAdded = utilisateurRepositoryImplUnderTest.read(utilisateurToAddConnection.getEmail());
@@ -322,7 +322,7 @@ public class UtilisateurRepositoryJpaTransactionsImplTest {
 
 		// ACT
 		utilisateurRepositoryImplUnderTest.addConnection(utilisateurToAddConnection, utilisateurExistingConnection);
-		repositoryTransactionsManager.commitTransaction();
+		repositoryTransactionsManager.commitTx();
 		
 		// ASSERT
 		Utilisateur utilisateurConnectionAdded = utilisateurRepositoryImplUnderTest.read(utilisateurToAddConnection.getEmail());

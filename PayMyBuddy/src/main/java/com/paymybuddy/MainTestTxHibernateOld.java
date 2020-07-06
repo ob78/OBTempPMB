@@ -13,7 +13,7 @@ import com.paymybuddy.factory.SessionFactoryPayMyBuddy;
 import com.paymybuddy.repository.IUtilisateurRepository;
 import com.paymybuddy.repository.UtilisateurRepositoryJpaImpl2;
 
-public class MainTestTransactionaleHibernate {
+public class MainTestTxHibernateOld {
 
 	public static void main(String[] args) {
 

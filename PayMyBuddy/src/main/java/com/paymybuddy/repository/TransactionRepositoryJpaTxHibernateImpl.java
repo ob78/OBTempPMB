@@ -9,16 +9,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.paymybuddy.entities.Transaction;
-import com.paymybuddy.repositorytransactionsmanager.RepositoryTransactionsManagerHibernateImpl;
+import com.paymybuddy.repositorytransactionsmanager.RepositoryTxManagerHibernate;
 
-public class TransactionRepositoryJpaHibernateImpl implements ITransactionRepository {
+public class TransactionRepositoryJpaTxHibernateImpl implements ITransactionRepository {
 
-	private static final Logger logger = LoggerFactory.getLogger(TransactionRepositoryJpaHibernateImpl.class);
+	private static final Logger logger = LoggerFactory.getLogger(TransactionRepositoryJpaTxHibernateImpl.class);
 
-	private RepositoryTransactionsManagerHibernateImpl repositoryManager = null;
+	private RepositoryTxManagerHibernate repositoryTxManager = null;
 
-	public TransactionRepositoryJpaHibernateImpl(RepositoryTransactionsManagerHibernateImpl repositoryManager) {
-		this.repositoryManager = repositoryManager;
+	public TransactionRepositoryJpaTxHibernateImpl(RepositoryTxManagerHibernate repositoryTxManager) {
+		this.repositoryTxManager = repositoryTxManager;
 	}
 
 	@Override
@@ -26,9 +26,9 @@ public class TransactionRepositoryJpaHibernateImpl implements ITransactionReposi
 			
 		//return repositoryManager.getCurrentSession().save(transactionToInsert);
 		
-		repositoryManager.getCurrentSession().save(transactionToInsert);
+		repositoryTxManager.getCurrentSession().save(transactionToInsert);
 	
-		Transaction transactionCreated = repositoryManager.getCurrentSession().get(Transaction.class, transactionToInsert.getIdTransaction());
+		Transaction transactionCreated = repositoryTxManager.getCurrentSession().get(Transaction.class, transactionToInsert.getIdTransaction());
 	
 		return transactionCreated;
 	}
@@ -36,14 +36,14 @@ public class TransactionRepositoryJpaHibernateImpl implements ITransactionReposi
 	@Override
 	public void update(Transaction transactionToUpdate) {
 		
-		repositoryManager.getCurrentSession().merge(transactionToUpdate);
+		repositoryTxManager.getCurrentSession().merge(transactionToUpdate);
 	
 	}
 
 	@Override
 	public Transaction read(long idTransaction) {
 		
-		Transaction transactionRead = repositoryManager.getCurrentSession().get(Transaction.class, idTransaction);
+		Transaction transactionRead = repositoryTxManager.getCurrentSession().get(Transaction.class, idTransaction);
 		
 		return transactionRead;
 
@@ -52,9 +52,9 @@ public class TransactionRepositoryJpaHibernateImpl implements ITransactionReposi
 	@Override
 	public void delete(long idTransaction) {
 		
-		Transaction transactionToDelete = repositoryManager.getCurrentSession().get(Transaction.class, idTransaction);
+		Transaction transactionToDelete = repositoryTxManager.getCurrentSession().get(Transaction.class, idTransaction);
 		
-		repositoryManager.getCurrentSession().delete(transactionToDelete);
+		repositoryTxManager.getCurrentSession().delete(transactionToDelete);
 
 	}
 
@@ -63,7 +63,7 @@ public class TransactionRepositoryJpaHibernateImpl implements ITransactionReposi
 		String REQUEST_TRANSACTIONS = "SELECT t FROM Transaction t WHERE t.initiateur.email IN ( SELECT email FROM Utilisateur WHERE email = :email ) ORDER by t.id DESC";
 		List<Transaction> transactions = new ArrayList<>();
 		
-		TypedQuery<Transaction> query = repositoryManager.getCurrentSession().createQuery(REQUEST_TRANSACTIONS, Transaction.class);
+		TypedQuery<Transaction> query = repositoryTxManager.getCurrentSession().createQuery(REQUEST_TRANSACTIONS, Transaction.class);
 		transactions = query.setParameter("email", emailUtilisateur).getResultList();
 		
 		/*

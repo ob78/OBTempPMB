@@ -13,29 +13,29 @@ import com.paymybuddy.entities.Utilisateur;
 import com.paymybuddy.factory.RepositoryFactory;
 import com.paymybuddy.repository.ITransactionRepository;
 import com.paymybuddy.repository.IUtilisateurRepository;
-import com.paymybuddy.repositorytransactionsmanager.RepositoryTransactionsManagerHibernateImpl;
+import com.paymybuddy.repositorytransactionsmanager.RepositoryTxManagerHibernate;
 
 public class TransactionTxHibernateService {
 
 	private static final Logger logger = LoggerFactory.getLogger(TransactionTxHibernateService.class);
 
-	private static String persistence = "hibernate.cfg.xml";
+	private static String hibernateConfigurationFile = "hibernate.cfg.xml";
 
-	private RepositoryTransactionsManagerHibernateImpl repositoryTransactionsManager = RepositoryTransactionsManagerHibernateImpl
-			.getRepositoryManagerHibernateImpl(persistence);
+	private RepositoryTxManagerHibernate repositoryTxManager = RepositoryTxManagerHibernate
+			.getRepositoryManagerHibernateImpl(hibernateConfigurationFile);
 
 	private IUtilisateurRepository utilisateurRepository = RepositoryFactory
-			.getUtilisateurRepository(repositoryTransactionsManager);
+			.getUtilisateurRepository(repositoryTxManager);
 
 	private ITransactionRepository transactionRepository = RepositoryFactory
-			.getTransactionRepository(repositoryTransactionsManager);
+			.getTransactionRepository(repositoryTxManager);
 
 	public List<Transaction> getAllTransactions(String utilisateurEmail) {
 
 		List<Transaction> transactions = new ArrayList<>();
 
 		try {
-			repositoryTransactionsManager.openCurrentSessionWithTransaction();
+			repositoryTxManager.openCurrentSessionWithTx();
 
 			if (utilisateurRepository.read(utilisateurEmail) == null) {
 				logger.error("Get all transctions : Utilisateur {} does not exist", utilisateurEmail);
@@ -43,18 +43,18 @@ public class TransactionTxHibernateService {
 			} else {
 				transactions = transactionRepository.getTransactions(utilisateurEmail);
 
-				repositoryTransactionsManager.commitTransaction();
+				repositoryTxManager.commitTx();
 
 				logger.info("Get all transctions for Utilisateur {} : success", utilisateurEmail);
 			}
 		} catch (Exception e) {
 			logger.error("Get all transctions for Utilisateur {} : error", utilisateurEmail);
 
-			repositoryTransactionsManager.rollbackTransaction();
+			repositoryTxManager.rollbackTx();
 		} finally {
 			logger.error("Closing current session");
 
-			repositoryTransactionsManager.closeCurrentSession();
+			repositoryTxManager.closeCurrentSession();
 		}
 
 		return transactions;
@@ -65,7 +65,7 @@ public class TransactionTxHibernateService {
 		boolean transactionDone = false;
 
 		try {
-			repositoryTransactionsManager.openCurrentSessionWithTransaction();
+			repositoryTxManager.openCurrentSessionWithTx();
 
 			if (utilisateurRepository.read(utilisateurEmail) == null) {
 				logger.error("Make a transaction : Utilisateur initiateur {} does not exist", utilisateurEmail);
@@ -94,7 +94,7 @@ public class TransactionTxHibernateService {
 
 					transactionRepository.create(transaction);
 
-					repositoryTransactionsManager.commitTransaction();
+					repositoryTxManager.commitTx();
 
 					logger.info(
 							"Make a transaction by Utilisateur intitateur {} to : Utilisateur contraprtie {} for amount = {} : done",
@@ -106,11 +106,11 @@ public class TransactionTxHibernateService {
 		} catch (Exception e) {
 			logger.error("Make a transaction by Utilisateur intitateur {} : error", utilisateurEmail);
 
-			repositoryTransactionsManager.rollbackTransaction();
+			repositoryTxManager.rollbackTx();
 		} finally {
 			logger.error("Closing current session");
 
-			repositoryTransactionsManager.closeCurrentSession();
+			repositoryTxManager.closeCurrentSession();
 		}
 
 		return transactionDone;

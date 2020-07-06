@@ -11,9 +11,9 @@ import com.paymybuddy.entities.Utilisateur;
 import com.paymybuddy.factory.RepositoryFactory;
 import com.paymybuddy.repository.ITransactionRepository;
 import com.paymybuddy.repository.IUtilisateurRepository;
-import com.paymybuddy.repositorytransactionsmanager.RepositoryTransactionsManagerJDBCImpl;
+import com.paymybuddy.repositorytransactionsmanager.RepositoryTxManagerJDBC;
 
-public class MainTestTransactionJDBC {
+public class MainTestTxJDBC {
 
 
 
@@ -21,7 +21,7 @@ public class MainTestTransactionJDBC {
 
 		 String persistence = "paymybuddy.properties";
 		
-		 RepositoryTransactionsManagerJDBCImpl repositoryManager;
+		 RepositoryTxManagerJDBC repositoryManager;
 
 		 ResourceDatabasePopulator resourceDatabasePopulator;
 
@@ -46,7 +46,7 @@ public class MainTestTransactionJDBC {
 		// We clear the database
 		DatabasePopulatorUtils.execute(resourceDatabasePopulator, dataSource);
 
-		repositoryManager = RepositoryTransactionsManagerJDBCImpl.getRepositoryManagerJDBCImpl(persistence);
+		repositoryManager = RepositoryTxManagerJDBC.getRepositoryManagerJDBCImpl(persistence);
 		
 		transactionRepositoryImplUnderTest = RepositoryFactory.getTransactionRepository(repositoryManager);
 
@@ -83,11 +83,11 @@ public class MainTestTransactionJDBC {
 		testUtilisateur.setSolde(333d);
 		//utilisateurRepositoryImplUnderTest.create(testUtilisateur);
 		
-		repositoryManager.commitTransaction();
+		repositoryManager.commitTx();
 		
 		} catch (Exception e) {
 			System.out.println("Error -> Rollback "+ e);
-			repositoryManager.rollbackTransaction();
+			repositoryManager.rollbackTx();
 		}
 				
 		repositoryManager.closeCurrentConnection();

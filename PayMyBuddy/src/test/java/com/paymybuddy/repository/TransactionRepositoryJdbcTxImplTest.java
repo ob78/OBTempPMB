@@ -21,9 +21,9 @@ import com.paymybuddy.configuration.RepositoryDataSource;
 import com.paymybuddy.entities.Transaction;
 import com.paymybuddy.entities.Utilisateur;
 import com.paymybuddy.factory.RepositoryFactory;
-import com.paymybuddy.repositorytransactionsmanager.RepositoryTransactionsManagerJDBCImpl;
+import com.paymybuddy.repositorytransactionsmanager.RepositoryTxManagerJDBC;
 
-public class TransactionRepositoryJdbcTransactionsImplTest {
+public class TransactionRepositoryJdbcTxImplTest {
 /*
 	private static String propertiesFilePathTest = "paymybuddyTest.properties";
 

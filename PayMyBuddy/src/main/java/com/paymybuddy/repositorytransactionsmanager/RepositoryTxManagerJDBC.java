@@ -10,15 +10,18 @@ import java.util.Properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class RepositoryTransactionsManagerJDBCImpl {
+/**
+ * Class in charge of the Tx management, JDBC implementation.
+ */
+public class RepositoryTxManagerJDBC {
 
 	private Connection currentConnection;
 	
-	private static RepositoryTransactionsManagerJDBCImpl repositoryManagerJDBCImpl = null;
+	private static RepositoryTxManagerJDBC repositoryTxManagerJDBC = null;
 		
 	// 	private Transaction currentTransaction;
 		
-	private static final Logger logger = LoggerFactory.getLogger(RepositoryTransactionsManagerJDBCImpl.class);
+	private static final Logger logger = LoggerFactory.getLogger(RepositoryTxManagerJDBC.class);
 
 	private static final String PROPERTY_URL = "url";
 	private static final String PROPERTY_USER_NAME = "username";
@@ -28,7 +31,7 @@ public class RepositoryTransactionsManagerJDBCImpl {
 	private String username;
 	private String password;
 
-	private RepositoryTransactionsManagerJDBCImpl(String url, String username, String password) {
+	private RepositoryTxManagerJDBC(String url, String username, String password) {
 		this.url = url;
 		this.username = username;
 		this.password = password;
@@ -44,14 +47,14 @@ public class RepositoryTransactionsManagerJDBCImpl {
 	 * 
 	 * @return An instance of a JDBC repository configuration
 	 */
-	public static RepositoryTransactionsManagerJDBCImpl getRepositoryManagerJDBCImpl(String configurationFile) {
-		if (repositoryManagerJDBCImpl == null) {
-			repositoryManagerJDBCImpl = getRepositoryConfigurationInstance(configurationFile);
+	public static RepositoryTxManagerJDBC getRepositoryManagerJDBCImpl(String configurationFile) {
+		if (repositoryTxManagerJDBC == null) {
+			repositoryTxManagerJDBC = getRepositoryConfigurationInstance(configurationFile);
 		}
-		return repositoryManagerJDBCImpl;
+		return repositoryTxManagerJDBC;
 	}
 
-	private static RepositoryTransactionsManagerJDBCImpl getRepositoryConfigurationInstance(String propertiesFilePath) {
+	private static RepositoryTxManagerJDBC getRepositoryConfigurationInstance(String propertiesFilePath) {
 		Properties properties = new Properties();
 
 		String url = null;
@@ -74,7 +77,7 @@ public class RepositoryTransactionsManagerJDBCImpl {
 			logger.error("Impossible de charger le fichier properties {}", propertiesFilePath);
 		}
 
-		RepositoryTransactionsManagerJDBCImpl repositoryManagerJDBCImpl = new RepositoryTransactionsManagerJDBCImpl(url, username,
+		RepositoryTxManagerJDBC repositoryManagerJDBCImpl = new RepositoryTxManagerJDBC(url, username,
 				password);
 
 		return repositoryManagerJDBCImpl;
@@ -110,7 +113,7 @@ public class RepositoryTransactionsManagerJDBCImpl {
 		}
 	}
 
-	public void commitTransaction() {
+	public void commitTx() {
 		try {
 			currentConnection.commit();
 		} catch (SQLException e) {
@@ -119,7 +122,7 @@ public class RepositoryTransactionsManagerJDBCImpl {
 		}
 	}
 
-	public void rollbackTransaction() {
+	public void rollbackTx() {
 		try {
 			currentConnection.rollback();
 		} catch (SQLException e) {

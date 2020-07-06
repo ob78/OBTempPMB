@@ -14,22 +14,22 @@ import org.slf4j.LoggerFactory;
 import com.paymybuddy.entities.Transaction;
 import com.paymybuddy.entities.Utilisateur;
 import com.paymybuddy.factory.RepositoryFactory;
-import com.paymybuddy.repositorytransactionsmanager.RepositoryTransactionsManagerJDBCImpl;
+import com.paymybuddy.repositorytransactionsmanager.RepositoryTxManagerJDBC;
 
 /**
  * Class managing the data persistence for the financial transaction.
  */
-public class TransactionRepositoryJdbcTransactionsImpl implements ITransactionRepository {
+public class TransactionRepositoryJdbcTxImpl implements ITransactionRepository {
 
-	private static final Logger logger = LoggerFactory.getLogger(TransactionRepositoryJdbcTransactionsImpl.class);
+	private static final Logger logger = LoggerFactory.getLogger(TransactionRepositoryJdbcTxImpl.class);
 
-	private RepositoryTransactionsManagerJDBCImpl repositoryManager = null;
+	private RepositoryTxManagerJDBC repositoryTxManager = null;
 
-	public TransactionRepositoryJdbcTransactionsImpl(RepositoryTransactionsManagerJDBCImpl repositoryManager) {
-		this.repositoryManager = repositoryManager;
+	public TransactionRepositoryJdbcTxImpl(RepositoryTxManagerJDBC repositoryTxManager) {
+		this.repositoryTxManager = repositoryTxManager;
 	}
 
-	IUtilisateurRepository utilisateurRepository = RepositoryFactory.getUtilisateurRepository(repositoryManager);
+	IUtilisateurRepository utilisateurRepository = RepositoryFactory.getUtilisateurRepository(repositoryTxManager);
 
 	/*
 	String propertiesFilePath = "paymybuddy.properties";
@@ -50,7 +50,7 @@ public class TransactionRepositoryJdbcTransactionsImpl implements ITransactionRe
 		final String REQUEST_CREATE = "INSERT INTO transaction (initiateur_email, contrepartie_email, montant, commentaire) VALUES(?,?,?,?)";
 
 		ResultSet rs = null;
-		Connection postgreCon = repositoryManager.getConnection();
+		Connection postgreCon = repositoryTxManager.getConnection();
 		try (
 			PreparedStatement ps = postgreCon.prepareStatement(REQUEST_CREATE, Statement.RETURN_GENERATED_KEYS)) {
 			ps.setString(1, transaction.getInitiateur().getEmail());
@@ -97,7 +97,7 @@ public class TransactionRepositoryJdbcTransactionsImpl implements ITransactionRe
 
 		final String REQUEST_UPDATE = "UPDATE transaction SET initiateur_email=?, contrepartie_email=?, montant=?, commentaire=? WHERE id_transaction=?";
 
-		Connection postgreCon = repositoryManager.getConnection();
+		Connection postgreCon = repositoryTxManager.getConnection();
 		try (
 			PreparedStatement ps = postgreCon.prepareStatement(REQUEST_UPDATE)) {
 			ps.setString(1, transaction.getInitiateur().getEmail());
@@ -132,7 +132,7 @@ public class TransactionRepositoryJdbcTransactionsImpl implements ITransactionRe
 		Transaction transaction = null;
 		ResultSet rs = null;
 		
-		Connection postgreCon = repositoryManager.getConnection();
+		Connection postgreCon = repositoryTxManager.getConnection();
 		try (
 			PreparedStatement ps = postgreCon.prepareStatement(REQUEST_READ)) {
 			
@@ -185,7 +185,7 @@ public class TransactionRepositoryJdbcTransactionsImpl implements ITransactionRe
 		Connection postgreCon = null;
 		PreparedStatement ps = null;
 		try {
-			postgreCon = repositoryManager.getConnection();
+			postgreCon = repositoryTxManager.getConnection();
 /*
 			boolean auto = postgreCon.getAutoCommit();
 			postgreCon.setAutoCommit(false);
@@ -238,7 +238,7 @@ public class TransactionRepositoryJdbcTransactionsImpl implements ITransactionRe
 		List<Transaction> transactions = new ArrayList<>();
 
 		ResultSet rs = null;
-		Connection postgreCon = repositoryManager.getConnection();
+		Connection postgreCon = repositoryTxManager.getConnection();
 		try (
 			PreparedStatement ps = postgreCon.prepareStatement(REQUEST_TRANSACTIONS)) {
 			ps.setString(1, emailUtilisateur);
