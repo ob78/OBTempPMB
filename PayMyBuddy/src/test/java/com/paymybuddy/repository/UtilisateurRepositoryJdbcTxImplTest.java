@@ -11,6 +11,7 @@ import java.util.Set;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
@@ -22,20 +23,21 @@ import com.paymybuddy.entities.Utilisateur;
 import com.paymybuddy.factory.RepositoryFactory;
 import com.paymybuddy.repositorytransactionsmanager.RepositoryTxManagerJDBC;
 
+@Disabled
 public class UtilisateurRepositoryJdbcTxImplTest {
-/*
+
 	private static String propertiesFilePathTest = "paymybuddyTest.properties";
 
-	private static RepositoryTransactionsManagerJDBCImpl repositoryTransactionsManager;
-	
+	private static RepositoryTxManagerJDBC repositoryTxManager;
+
 	private static ResourceDatabasePopulator resourceDatabasePopulator;
-	
+
 	private static DriverManagerDataSource dataSource;
-	
+
 	private IUtilisateurRepository utilisateurRepositoryImplUnderTest;
-	
-	@BeforeAll 
-	private static void setUpAllTest(){
+
+	@BeforeAll
+	private static void setUpAllTest() {
 		// We get a dataSource
 		dataSource = RepositoryDataSource.getDataSource("org.postgresql.Driver",
 				"jdbc:postgresql://localhost/PayMyBuddyTest", "postgres", "admin");
@@ -44,25 +46,25 @@ public class UtilisateurRepositoryJdbcTxImplTest {
 		resourceDatabasePopulator = new ResourceDatabasePopulator();
 		resourceDatabasePopulator.addScript(new ClassPathResource("/cleanDBForTests.sql"));
 	}
-		
+
 	@BeforeEach
 	private void setUpPerTest() {
 		// We clear the database
 		DatabasePopulatorUtils.execute(resourceDatabasePopulator, dataSource);
 
-		repositoryTransactionsManager = RepositoryTransactionsManagerJDBCImpl.getRepositoryManagerJDBCImpl(propertiesFilePathTest);
-		
-		utilisateurRepositoryImplUnderTest = RepositoryFactory.getUtilisateurRepository(repositoryTransactionsManager);
+		repositoryTxManager = RepositoryTxManagerJDBC.getRepositoryTxManagerJDBC(propertiesFilePathTest);
 
-		repositoryTransactionsManager.getConnection();
-		
+		utilisateurRepositoryImplUnderTest = RepositoryFactory.getUtilisateurRepository(repositoryTxManager);
+
+		repositoryTxManager.getConnection();
+
 	}
-	
+
 	@AfterEach
 	private void afterPerTest() {
-		repositoryTransactionsManager.closeCurrentConnection();
+		repositoryTxManager.closeCurrentConnection();
 	}
-		
+
 	@Test
 	public void createUtilisateur() {
 		// ARRANGE
@@ -70,19 +72,19 @@ public class UtilisateurRepositoryJdbcTxImplTest {
 		utilisateurToCreate.setEmail("abc@test.com");
 		utilisateurToCreate.setPassword("abc");
 		utilisateurToCreate.setSolde(123d);
-				
+
 		// ACT
 		utilisateurRepositoryImplUnderTest.create(utilisateurToCreate);
-		repositoryTransactionsManager.commitTransaction();
-		
+		repositoryTxManager.commitTx();
+
 		// ASSERT
 		assertNotNull(utilisateurRepositoryImplUnderTest.read(utilisateurToCreate.getEmail()));
-		assertEquals(utilisateurToCreate,
-				utilisateurRepositoryImplUnderTest.read(utilisateurToCreate.getEmail()));
-	
-		assertThat(utilisateurRepositoryImplUnderTest.read(utilisateurToCreate.getEmail())).isEqualTo(utilisateurToCreate);
+		assertEquals(utilisateurToCreate, utilisateurRepositoryImplUnderTest.read(utilisateurToCreate.getEmail()));
+
+		assertThat(utilisateurRepositoryImplUnderTest.read(utilisateurToCreate.getEmail()))
+				.isEqualTo(utilisateurToCreate);
 	}
-	
+
 	@Test
 	public void deleteUtilisateur() {
 		// ARRANGE
@@ -95,12 +97,12 @@ public class UtilisateurRepositoryJdbcTxImplTest {
 
 		// ACT
 		utilisateurRepositoryImplUnderTest.delete(utilisateurToDelete.getEmail());
-		repositoryTransactionsManager.commitTransaction();
-		
+		repositoryTxManager.commitTx();
+
 		// ASSERT
 		assertNull(utilisateurRepositoryImplUnderTest.read(utilisateurToDelete.getEmail()));
 	}
-	
+
 	@Test
 	public void updateUtilisateur() {
 		// ARRANGE
@@ -118,15 +120,16 @@ public class UtilisateurRepositoryJdbcTxImplTest {
 
 		// ACT
 		utilisateurRepositoryImplUnderTest.update(utilisateurUpdated);
-		repositoryTransactionsManager.commitTransaction();
-		
+		repositoryTxManager.commitTx();
+
 		// ASSERT
 		assertEquals(utilisateurUpdated, utilisateurRepositoryImplUnderTest.read(utilisateurToUpdate.getEmail()));
-	
-		assertThat(utilisateurRepositoryImplUnderTest.read(utilisateurToUpdate.getEmail())).isEqualTo(utilisateurUpdated);
+
+		assertThat(utilisateurRepositoryImplUnderTest.read(utilisateurToUpdate.getEmail()))
+				.isEqualTo(utilisateurUpdated);
 
 	}
-	
+
 	@Test
 	public void readUtilisateur_whenUtilisateurExist_whenUtilisateurHasNoConnection() {
 		// ARRANGE
@@ -136,18 +139,18 @@ public class UtilisateurRepositoryJdbcTxImplTest {
 		utilisateurToRead.setSolde(123d);
 
 		utilisateurRepositoryImplUnderTest.create(utilisateurToRead);
-		repositoryTransactionsManager.commitTransaction();
-		
+		repositoryTxManager.commitTx();
+
 		// ACT
 		Utilisateur utilisateurRead = utilisateurRepositoryImplUnderTest.read(utilisateurToRead.getEmail());
 
 		// ASSERT
 		assertNotNull(utilisateurRead);
 		assertEquals(utilisateurToRead, utilisateurRead);
-		
+
 		assertThat(utilisateurRead).isEqualTo(utilisateurToRead);
 	}
-	
+
 	@Test
 	public void readUtilisateur_whenUtilisateurExist_whenUtilisateurHasAConnection() {
 		// ARRANGE
@@ -156,7 +159,7 @@ public class UtilisateurRepositoryJdbcTxImplTest {
 		utilisateurToRead.setPassword("abc");
 		utilisateurToRead.setSolde(123d);
 		utilisateurRepositoryImplUnderTest.create(utilisateurToRead);
-		
+
 		Utilisateur utilisateurConnectionToRead = new Utilisateur();
 		utilisateurConnectionToRead.setEmail("def@test.com");
 		utilisateurConnectionToRead.setPassword("def");
@@ -166,26 +169,26 @@ public class UtilisateurRepositoryJdbcTxImplTest {
 		Set<Utilisateur> connectionsToRead = new HashSet<>();
 		connectionsToRead.add(utilisateurConnectionToRead);
 		utilisateurToRead.setConnection(connectionsToRead);
-		
+
 		utilisateurRepositoryImplUnderTest.addConnection(utilisateurToRead, utilisateurConnectionToRead);
 
 		// ACT
 		Utilisateur utilisateurRead = utilisateurRepositoryImplUnderTest.read(utilisateurToRead.getEmail());
-		repositoryTransactionsManager.commitTransaction();
-		
+		repositoryTxManager.commitTx();
+
 		// ASSERT
 		assertNotNull(utilisateurRead);
 		assertEquals(utilisateurToRead, utilisateurRead);
-		
+
 		assertThat(utilisateurRead).isEqualTo(utilisateurToRead);
 	}
-	
+
 	@Test
 	public void readUtilisateur_whenUtilisateurNotExist() {
 		// ACT & ASSERT
 		assertNull(utilisateurRepositoryImplUnderTest.read("UtilisateurNotExist"));
 	}
-	
+
 	@Test
 	public void addAConnection_whenNoExistingConnection() {
 		// ARRANGE
@@ -193,31 +196,33 @@ public class UtilisateurRepositoryJdbcTxImplTest {
 		utilisateurToAddConnection.setEmail("abc@test.com");
 		utilisateurToAddConnection.setPassword("abc");
 		utilisateurToAddConnection.setSolde(123d);
-		
+
 		utilisateurRepositoryImplUnderTest.create(utilisateurToAddConnection);
-		
+
 		Utilisateur utilisateurNewConnection = new Utilisateur();
 		utilisateurNewConnection.setEmail("def@test.com");
 		utilisateurNewConnection.setPassword("def");
 		utilisateurNewConnection.setSolde(456d);
 
 		utilisateurRepositoryImplUnderTest.create(utilisateurNewConnection);
-		
+
 		Set<Utilisateur> connections = new HashSet<>();
 		connections.add(utilisateurNewConnection);
 		utilisateurToAddConnection.setConnection(connections);
-		
+
 		// ACT
 		utilisateurRepositoryImplUnderTest.addConnection(utilisateurToAddConnection, utilisateurNewConnection);
-		repositoryTransactionsManager.commitTransaction();
-		
+		repositoryTxManager.commitTx();
+
 		// ASSERT
-		assertEquals(utilisateurToAddConnection, utilisateurRepositoryImplUnderTest.read(utilisateurToAddConnection.getEmail()));
-	
-		assertThat(utilisateurRepositoryImplUnderTest.read(utilisateurToAddConnection.getEmail())).isEqualTo(utilisateurToAddConnection);
+		assertEquals(utilisateurToAddConnection,
+				utilisateurRepositoryImplUnderTest.read(utilisateurToAddConnection.getEmail()));
+
+		assertThat(utilisateurRepositoryImplUnderTest.read(utilisateurToAddConnection.getEmail()))
+				.isEqualTo(utilisateurToAddConnection);
 
 	}
-	
+
 	@Test
 	public void addAConnection_whenExistingConnection() {
 		// ARRANGE
@@ -232,36 +237,40 @@ public class UtilisateurRepositoryJdbcTxImplTest {
 		utilisateurExistingConnection.setSolde(456d);
 
 		utilisateurRepositoryImplUnderTest.create(utilisateurExistingConnection);
-		
+
 		Set<Utilisateur> connections = new HashSet<>();
 		connections.add(utilisateurExistingConnection);
 		utilisateurToAddConnection.setConnection(connections);
-		
+
 		utilisateurRepositoryImplUnderTest.create(utilisateurToAddConnection);
-		
-		utilisateurRepositoryImplUnderTest.addConnection(utilisateurToAddConnection, utilisateurExistingConnection);  ;
-		
+
+		utilisateurRepositoryImplUnderTest.addConnection(utilisateurToAddConnection, utilisateurExistingConnection);
+		;
+
 		Utilisateur utilisateurNewConnection = new Utilisateur();
 		utilisateurNewConnection.setEmail("ghi@test.com");
 		utilisateurNewConnection.setPassword("ghi");
 		utilisateurNewConnection.setSolde(789d);
 
 		utilisateurRepositoryImplUnderTest.create(utilisateurNewConnection);
-		
+
 		connections.add(utilisateurNewConnection);
 		utilisateurToAddConnection.setConnection(connections);
-		
+
 		// ACT
-		utilisateurRepositoryImplUnderTest.addConnection(utilisateurToAddConnection, utilisateurNewConnection);   ;
-		repositoryTransactionsManager.commitTransaction();
-		
+		utilisateurRepositoryImplUnderTest.addConnection(utilisateurToAddConnection, utilisateurNewConnection);
+		;
+		repositoryTxManager.commitTx();
+
 		// ASSERT
-		assertEquals(utilisateurToAddConnection, utilisateurRepositoryImplUnderTest.read(utilisateurToAddConnection.getEmail()));
-	
-		assertThat(utilisateurRepositoryImplUnderTest.read(utilisateurToAddConnection.getEmail())).isEqualTo(utilisateurToAddConnection);
+		assertEquals(utilisateurToAddConnection,
+				utilisateurRepositoryImplUnderTest.read(utilisateurToAddConnection.getEmail()));
+
+		assertThat(utilisateurRepositoryImplUnderTest.read(utilisateurToAddConnection.getEmail()))
+				.isEqualTo(utilisateurToAddConnection);
 
 	}
-	
+
 	@Test
 	public void addAConnection_whenConnectionAlreadyExisting() {
 		// ARRANGE
@@ -276,24 +285,26 @@ public class UtilisateurRepositoryJdbcTxImplTest {
 		utilisateurExistingConnection.setSolde(456d);
 
 		utilisateurRepositoryImplUnderTest.create(utilisateurExistingConnection);
-		
+
 		Set<Utilisateur> connections = new HashSet<>();
 		connections.add(utilisateurExistingConnection);
 		utilisateurToAddConnection.setConnection(connections);
-		
+
 		utilisateurRepositoryImplUnderTest.create(utilisateurToAddConnection);
-		
+
 		utilisateurRepositoryImplUnderTest.addConnection(utilisateurToAddConnection, utilisateurExistingConnection);
 
 		// ACT
 		utilisateurRepositoryImplUnderTest.addConnection(utilisateurToAddConnection, utilisateurExistingConnection);
-		repositoryTransactionsManager.commitTransaction();
-		
+		repositoryTxManager.commitTx();
+
 		// ASSERT
-		assertEquals(utilisateurToAddConnection, utilisateurRepositoryImplUnderTest.read(utilisateurToAddConnection.getEmail()));
-	
-		assertThat(utilisateurRepositoryImplUnderTest.read(utilisateurToAddConnection.getEmail())).isEqualTo(utilisateurToAddConnection);
+		assertEquals(utilisateurToAddConnection,
+				utilisateurRepositoryImplUnderTest.read(utilisateurToAddConnection.getEmail()));
+
+		assertThat(utilisateurRepositoryImplUnderTest.read(utilisateurToAddConnection.getEmail()))
+				.isEqualTo(utilisateurToAddConnection);
 
 	}
-*/
+
 }

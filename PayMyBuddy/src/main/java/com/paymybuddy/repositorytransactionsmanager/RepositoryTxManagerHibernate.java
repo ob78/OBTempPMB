@@ -33,7 +33,7 @@ public class RepositoryTxManagerHibernate {
 	 * 
 	 * @return The RepositoryTxManagerHibernate
 	 */
-	public static RepositoryTxManagerHibernate getRepositoryManagerHibernateImpl(String configurationFile) {
+	public static RepositoryTxManagerHibernate getRepositoryTxManagerHibernate(String configurationFile) {
 		if (repositoryTxManagerHibernate == null) {
 			repositoryTxManagerHibernate = new RepositoryTxManagerHibernate(configurationFile);
 			return repositoryTxManagerHibernate;

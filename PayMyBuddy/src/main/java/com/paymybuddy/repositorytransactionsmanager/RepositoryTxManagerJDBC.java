@@ -47,7 +47,7 @@ public class RepositoryTxManagerJDBC {
 	 * 
 	 * @return An instance of a JDBC repository configuration
 	 */
-	public static RepositoryTxManagerJDBC getRepositoryManagerJDBCImpl(String configurationFile) {
+	public static RepositoryTxManagerJDBC getRepositoryTxManagerJDBC(String configurationFile) {
 		if (repositoryTxManagerJDBC == null) {
 			repositoryTxManagerJDBC = getRepositoryConfigurationInstance(configurationFile);
 		}

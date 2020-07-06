@@ -15,6 +15,10 @@ import com.paymybuddy.repository.ITransactionRepository;
 import com.paymybuddy.repository.IUtilisateurRepository;
 import com.paymybuddy.repositorytransactionsmanager.RepositoryTxManagerHibernate;
 
+/**
+ * Class managing the services related to financial transactions using Hibernate
+ * Tx management.
+ */
 public class TransactionTxHibernateService {
 
 	private static final Logger logger = LoggerFactory.getLogger(TransactionTxHibernateService.class);
@@ -22,7 +26,7 @@ public class TransactionTxHibernateService {
 	private static String hibernateConfigurationFile = "hibernate.cfg.xml";
 
 	private RepositoryTxManagerHibernate repositoryTxManager = RepositoryTxManagerHibernate
-			.getRepositoryManagerHibernateImpl(hibernateConfigurationFile);
+			.getRepositoryTxManagerHibernate(hibernateConfigurationFile);
 
 	private IUtilisateurRepository utilisateurRepository = RepositoryFactory
 			.getUtilisateurRepository(repositoryTxManager);
@@ -30,6 +34,13 @@ public class TransactionTxHibernateService {
 	private ITransactionRepository transactionRepository = RepositoryFactory
 			.getTransactionRepository(repositoryTxManager);
 
+	/**
+	 * Return all financial transactions made by an user.
+	 * 
+	 * @param utilisateurEmail The email of the user
+	 * 
+	 * @return The financial transactions
+	 */
 	public List<Transaction> getAllTransactions(String utilisateurEmail) {
 
 		List<Transaction> transactions = new ArrayList<>();
@@ -38,17 +49,16 @@ public class TransactionTxHibernateService {
 			repositoryTxManager.openCurrentSessionWithTx();
 
 			if (utilisateurRepository.read(utilisateurEmail) == null) {
-				logger.error("Get all transctions : Utilisateur {} does not exist", utilisateurEmail);
-				// return null;
+				logger.error("Get all transactions : Utilisateur {} does not exist", utilisateurEmail);
 			} else {
 				transactions = transactionRepository.getTransactions(utilisateurEmail);
 
 				repositoryTxManager.commitTx();
 
-				logger.info("Get all transctions for Utilisateur {} : success", utilisateurEmail);
+				logger.info("Get all transactions for Utilisateur {} : success", utilisateurEmail);
 			}
 		} catch (Exception e) {
-			logger.error("Get all transctions for Utilisateur {} : error", utilisateurEmail);
+			logger.error("Get all transactions for Utilisateur {} : error", utilisateurEmail);
 
 			repositoryTxManager.rollbackTx();
 		} finally {
@@ -60,27 +70,40 @@ public class TransactionTxHibernateService {
 		return transactions;
 	}
 
-	public boolean makeATransacton(String utilisateurEmail, String connectionEmail, Double montant) {
+	/**
+	 * Method making a financial transaction between an initiator user and a
+	 * counterpart user for a certain amount.
+	 * 
+	 * @param initiateurEmail   The email of the initiator of the transaction
+	 * 
+	 * @param contrepartieEmail The email of the counterpart of the transaction
+	 * 
+	 * @return True if the transaction has been successfully executed, false if it
+	 *         has failed
+	 */
+	public boolean makeATransaction(String initiateurEmail, String contrepartieEmail, Double montant) {
 
 		boolean transactionDone = false;
 
 		try {
 			repositoryTxManager.openCurrentSessionWithTx();
 
-			if (utilisateurRepository.read(utilisateurEmail) == null) {
-				logger.error("Make a transaction : Utilisateur initiateur {} does not exist", utilisateurEmail);
-			} else if (utilisateurRepository.read(connectionEmail) == null) {
-				logger.error("Make a transaction : Utilisateur contrepartie {} does not exist", connectionEmail);
+			if (utilisateurRepository.read(initiateurEmail) == null) {
+				logger.error("Make a transaction : Utilisateur initiateur {} does not exist", initiateurEmail);
+			} else if (utilisateurRepository.read(contrepartieEmail) == null) {
+				logger.error("Make a transaction : Utilisateur contrepartie {} does not exist", contrepartieEmail);
 			} else {
-				Utilisateur utilisateur = utilisateurRepository.read(utilisateurEmail);
+				Utilisateur utilisateur = utilisateurRepository.read(initiateurEmail);
 				Set<Utilisateur> utilisateurConnections = new HashSet<>();
 				utilisateurConnections = utilisateur.getConnection();
 
-				Utilisateur connection = utilisateurRepository.read(connectionEmail);
+				Utilisateur connection = utilisateurRepository.read(contrepartieEmail);
 				if (!utilisateurConnections.contains(connection)) {
-					logger.error("Make a transaction : Utilisateur {} not connected", utilisateurEmail);
+					logger.error("Make a transaction : Utilisateur {} not connected", initiateurEmail);
 				} else if (utilisateur.getSolde() < montant) {
-					logger.error("Make a transaction : Utilisateur {} solde not sufficient", utilisateurEmail);
+					logger.error(
+							"Make a transaction : Utilisateur {} solde = {} not sufficient for transaction amount = {}",
+							initiateurEmail, utilisateur.getSolde(), montant);
 				} else {
 					utilisateur.setSolde(utilisateur.getSolde() - montant);
 					connection.setSolde(connection.getSolde() + montant);
@@ -97,14 +120,14 @@ public class TransactionTxHibernateService {
 					repositoryTxManager.commitTx();
 
 					logger.info(
-							"Make a transaction by Utilisateur intitateur {} to : Utilisateur contraprtie {} for amount = {} : done",
-							utilisateurEmail, connectionEmail, montant);
+							"Transaction made by Utilisateur intiatateur {} to Utilisateur contrepartie {} for amount = {} : done",
+							initiateurEmail, contrepartieEmail, montant);
 
 					transactionDone = true;
 				}
 			}
 		} catch (Exception e) {
-			logger.error("Make a transaction by Utilisateur intitateur {} : error", utilisateurEmail);
+			logger.error("Make a transaction by Utilisateur intitateur {} : error", initiateurEmail);
 
 			repositoryTxManager.rollbackTx();
 		} finally {

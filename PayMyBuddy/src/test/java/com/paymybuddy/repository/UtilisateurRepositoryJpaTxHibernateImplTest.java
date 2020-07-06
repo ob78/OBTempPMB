@@ -23,11 +23,11 @@ import com.paymybuddy.repositorytransactionsmanager.RepositoryTxManagerHibernate
 
 
 
-public class UtilisateurRepositoryJpaTransactionsImplTest {
+public class UtilisateurRepositoryJpaTxHibernateImplTest {
 
 	private static String hibernateConfigFile = "src/test/resources/hibernateTest.cfg.xml";
 	
-	private static RepositoryTxManagerHibernate repositoryTransactionsManager;
+	private static RepositoryTxManagerHibernate repositoryTxManager;
 	
 	private static ResourceDatabasePopulator resourceDatabasePopulator;
 	
@@ -52,18 +52,18 @@ public class UtilisateurRepositoryJpaTransactionsImplTest {
 		// We clear the database
 		DatabasePopulatorUtils.execute(resourceDatabasePopulator, dataSource);
 
-		repositoryTransactionsManager = RepositoryTxManagerHibernate.getRepositoryManagerHibernateImpl(hibernateConfigFile);
+		repositoryTxManager = RepositoryTxManagerHibernate.getRepositoryTxManagerHibernate(hibernateConfigFile);
 		
-		utilisateurRepositoryImplUnderTest = RepositoryFactory.getUtilisateurRepository(repositoryTransactionsManager);
+		utilisateurRepositoryImplUnderTest = RepositoryFactory.getUtilisateurRepository(repositoryTxManager);
 	
-		repositoryTransactionsManager.openCurrentSessionWithTx();
+		repositoryTxManager.openCurrentSessionWithTx();
 	}
 		
 	@AfterEach
 	private void afterPerTest() {
 		//repositoryManager.commitTransaction();
 		
-		repositoryTransactionsManager.closeCurrentSession();
+		repositoryTxManager.closeCurrentSession();
 
 	}
 	
@@ -105,7 +105,7 @@ public class UtilisateurRepositoryJpaTransactionsImplTest {
 
 		// ACT
 		utilisateurRepositoryImplUnderTest.delete(utilisateurToDelete.getEmail());
-		repositoryTransactionsManager.commitTx();
+		repositoryTxManager.commitTx();
 		
 		// ASSERT
 		assertNull(utilisateurRepositoryImplUnderTest.read(utilisateurToDelete.getEmail()));
@@ -128,7 +128,7 @@ public class UtilisateurRepositoryJpaTransactionsImplTest {
 
 		// ACT
 		utilisateurRepositoryImplUnderTest.update(utilisateurUpdated);
-		repositoryTransactionsManager.commitTx();
+		repositoryTxManager.commitTx();
 		
 		// ASSERT
 		assertEquals(utilisateurUpdated.getSolde(),
@@ -152,7 +152,7 @@ public class UtilisateurRepositoryJpaTransactionsImplTest {
 		utilisateurToRead.setSolde(123d);
 
 		utilisateurRepositoryImplUnderTest.create(utilisateurToRead);
-		repositoryTransactionsManager.commitTx();
+		repositoryTxManager.commitTx();
 		
 		// ACT
 		Utilisateur utilisateurRead = utilisateurRepositoryImplUnderTest.read(utilisateurToRead.getEmail());
@@ -189,7 +189,7 @@ public class UtilisateurRepositoryJpaTransactionsImplTest {
 
 		// ACT
 		Utilisateur utilisateurRead = utilisateurRepositoryImplUnderTest.read(utilisateurToRead.getEmail());
-		repositoryTransactionsManager.commitTx();
+		repositoryTxManager.commitTx();
 		
 		// ASSERT
 		assertNotNull(utilisateurRead);
@@ -233,7 +233,7 @@ public class UtilisateurRepositoryJpaTransactionsImplTest {
 		
 		// ACT
 		utilisateurRepositoryImplUnderTest.addConnection(utilisateurToAddConnection, utilisateurNewConnection);
-		repositoryTransactionsManager.commitTx();
+		repositoryTxManager.commitTx();
 		
 		// ASSERT
 		Utilisateur utilisateurConnectionAdded = utilisateurRepositoryImplUnderTest.read(utilisateurToAddConnection.getEmail());
@@ -280,7 +280,7 @@ public class UtilisateurRepositoryJpaTransactionsImplTest {
 		
 		// ACT
 		utilisateurRepositoryImplUnderTest.addConnection(utilisateurToAddConnection, utilisateurNewConnection);   ;
-		repositoryTransactionsManager.commitTx();
+		repositoryTxManager.commitTx();
 		
 		// ASSERT
 		Utilisateur utilisateurConnectionAdded = utilisateurRepositoryImplUnderTest.read(utilisateurToAddConnection.getEmail());
@@ -322,7 +322,7 @@ public class UtilisateurRepositoryJpaTransactionsImplTest {
 
 		// ACT
 		utilisateurRepositoryImplUnderTest.addConnection(utilisateurToAddConnection, utilisateurExistingConnection);
-		repositoryTransactionsManager.commitTx();
+		repositoryTxManager.commitTx();
 		
 		// ASSERT
 		Utilisateur utilisateurConnectionAdded = utilisateurRepositoryImplUnderTest.read(utilisateurToAddConnection.getEmail());

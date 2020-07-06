@@ -46,7 +46,7 @@ public class MainTestTxHibernate {
 		// We clear the database
 		DatabasePopulatorUtils.execute(resourceDatabasePopulator, dataSource);
 
-		repositoryManager = RepositoryTxManagerHibernate.getRepositoryManagerHibernateImpl(persistence);
+		repositoryManager = RepositoryTxManagerHibernate.getRepositoryTxManagerHibernate(persistence);
 		
 		transactionRepositoryImplUnderTest = RepositoryFactory.getTransactionRepository(repositoryManager);
 

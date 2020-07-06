@@ -11,6 +11,9 @@ import com.paymybuddy.factory.RepositoryFactory;
 import com.paymybuddy.repository.IUtilisateurRepository;
 import com.paymybuddy.repositorytransactionsmanager.RepositoryTxManagerHibernate;
 
+/**
+ * Class managing the services related to an user using Hibernate Tx management.
+ */
 public class UtilisateurTxHibernateService {
 
 	private static final Logger logger = LoggerFactory.getLogger(UtilisateurTxHibernateService.class);
@@ -18,11 +21,21 @@ public class UtilisateurTxHibernateService {
 	private static String hibernateConfigurationFile = "hibernate.cfg.xml";
 
 	private RepositoryTxManagerHibernate repositoryTxManager = RepositoryTxManagerHibernate
-			.getRepositoryManagerHibernateImpl(hibernateConfigurationFile);
+			.getRepositoryTxManagerHibernate(hibernateConfigurationFile);
 
 	private IUtilisateurRepository utilisateurRepository = RepositoryFactory
 			.getUtilisateurRepository(repositoryTxManager);
 
+	/**
+	 * Method managing the registration on an user to the application.
+	 * 
+	 * @param email    The email of the user to register
+	 * 
+	 * @param password The password of the user to register
+	 * 
+	 * @return True if the registration has been successfully executed, false if it
+	 *         has failed
+	 */
 	public boolean registerToApplication(String email, String password) {
 
 		boolean utilisateurRegistered = false;
@@ -60,6 +73,16 @@ public class UtilisateurTxHibernateService {
 		return utilisateurRegistered;
 	}
 
+	/**
+	 * Method managing the connection on an user to the application.
+	 * 
+	 * @param email    The email of the user to connect
+	 * 
+	 * @param password The password of the user to connect
+	 * 
+	 * @return True if the connection has been successfully executed, false if it
+	 *         has failed
+	 */
 	public boolean connectToApplication(String email, String password) {
 
 		boolean utilisateurConnected = false;
@@ -92,6 +115,16 @@ public class UtilisateurTxHibernateService {
 
 	}
 
+	/**
+	 * Method managing the wire by a user to his account for a certain amount.
+	 * 
+	 * @param email  The email of the user for which to perform the wire
+	 * 
+	 * @param amount The amount of the wire
+	 * 
+	 * @return True if the wire has been successfully executed, false if it has
+	 *         failed
+	 */
 	public boolean wireToAccount(String email, Double amount) {
 
 		boolean wireToAccountDone = false;
@@ -131,6 +164,17 @@ public class UtilisateurTxHibernateService {
 		return wireToAccountDone;
 	}
 
+	/**
+	 * Method managing the withdrawal by a user from his account for a certain
+	 * amount.
+	 * 
+	 * @param email  The email of the user for which to perform the withdrawal
+	 * 
+	 * @param amount The amount of the withdrawal
+	 * 
+	 * @return True if the withdrawal has been successfully executed, false if it
+	 *         has failed
+	 */
 	public boolean withdrawalFromAccount(String email, Double amount) {
 
 		boolean withdrawalFromAccountDone = false;
@@ -175,6 +219,17 @@ public class UtilisateurTxHibernateService {
 		return withdrawalFromAccountDone;
 	}
 
+	/**
+	 * Method managing the addition by a user of a new connection.
+	 * 
+	 * @param utilisateurEmail The email of the user for which to add a new
+	 *                         connection
+	 * 
+	 * @param connectionEmail  The email of the the connection to add
+	 * 
+	 * @return True if the connection add has been successfully executed, false if
+	 *         it has failed
+	 */
 	public boolean addConnection(String utilisateurEmail, String connectionEmail) {
 
 		boolean connectionAdded = false;

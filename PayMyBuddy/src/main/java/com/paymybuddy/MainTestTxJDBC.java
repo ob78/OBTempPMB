@@ -46,7 +46,7 @@ public class MainTestTxJDBC {
 		// We clear the database
 		DatabasePopulatorUtils.execute(resourceDatabasePopulator, dataSource);
 
-		repositoryManager = RepositoryTxManagerJDBC.getRepositoryManagerJDBCImpl(persistence);
+		repositoryManager = RepositoryTxManagerJDBC.getRepositoryTxManagerJDBC(persistence);
 		
 		transactionRepositoryImplUnderTest = RepositoryFactory.getTransactionRepository(repositoryManager);
 

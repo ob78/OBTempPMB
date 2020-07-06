@@ -11,6 +11,7 @@ import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
@@ -23,12 +24,13 @@ import com.paymybuddy.entities.Utilisateur;
 import com.paymybuddy.factory.RepositoryFactory;
 import com.paymybuddy.repositorytransactionsmanager.RepositoryTxManagerJDBC;
 
+@Disabled
 public class TransactionRepositoryJdbcTxImplTest {
-/*
+
 	private static String propertiesFilePathTest = "paymybuddyTest.properties";
 
-	private static RepositoryTransactionsManagerJDBCImpl repositoryTransactionsManager;
-	
+	private static RepositoryTxManagerJDBC repositoryTxManager;
+
 	private static ResourceDatabasePopulator resourceDatabasePopulator;
 
 	private static DriverManagerDataSource dataSource;
@@ -53,20 +55,20 @@ public class TransactionRepositoryJdbcTxImplTest {
 		// We clear the database
 		DatabasePopulatorUtils.execute(resourceDatabasePopulator, dataSource);
 
-		repositoryTransactionsManager = RepositoryTransactionsManagerJDBCImpl.getRepositoryManagerJDBCImpl(propertiesFilePathTest);
-				
-		transactionRepositoryImplUnderTest = RepositoryFactory.getTransactionRepository(repositoryTransactionsManager);
+		repositoryTxManager = RepositoryTxManagerJDBC.getRepositoryTxManagerJDBC(propertiesFilePathTest);
 
-		utilisateurRepositoryImplUnderTest = RepositoryFactory.getUtilisateurRepository(repositoryTransactionsManager);
+		transactionRepositoryImplUnderTest = RepositoryFactory.getTransactionRepository(repositoryTxManager);
 
-		repositoryTransactionsManager.getConnection();
+		utilisateurRepositoryImplUnderTest = RepositoryFactory.getUtilisateurRepository(repositoryTxManager);
+
+		repositoryTxManager.getConnection();
 	}
 
 	@AfterEach
 	private void afterPerTest() {
-		repositoryTransactionsManager.closeCurrentConnection();
+		repositoryTxManager.closeCurrentConnection();
 	}
-	
+
 	@Test
 	public void createTransaction() {
 		// ARRANGE
@@ -82,8 +84,8 @@ public class TransactionRepositoryJdbcTxImplTest {
 		// ACT
 		Transaction transactionCreated = transactionRepositoryImplUnderTest.create(transactionToCreate);
 
-		repositoryTransactionsManager.commitTransaction();
-		
+		repositoryTxManager.commitTx();
+
 		// ASSERT
 		assertNotNull(transactionRepositoryImplUnderTest.read(transactionCreated.getIdTransaction()));
 		assertEquals(transactionToCreate, transactionCreated);
@@ -108,8 +110,8 @@ public class TransactionRepositoryJdbcTxImplTest {
 		// ACT
 		transactionRepositoryImplUnderTest.delete(transactionDeleted.getIdTransaction());
 
-		repositoryTransactionsManager.commitTransaction();
-		
+		repositoryTxManager.commitTx();
+
 		// ASSERT
 		assertNull(transactionRepositoryImplUnderTest.read(transactionDeleted.getIdTransaction()));
 	}
@@ -133,8 +135,8 @@ public class TransactionRepositoryJdbcTxImplTest {
 		// ACT
 		transactionRepositoryImplUnderTest.update(transactionToUpdate);
 
-		repositoryTransactionsManager.commitTransaction();
-		
+		repositoryTxManager.commitTx();
+
 		// ASSERT
 		Transaction transactionUdpated = transactionRepositoryImplUnderTest
 				.read(transactionToUpdate.getIdTransaction());
@@ -162,8 +164,8 @@ public class TransactionRepositoryJdbcTxImplTest {
 		// ACT
 		Transaction transactionRead = transactionRepositoryImplUnderTest.read(transactionToRead.getIdTransaction());
 
-		repositoryTransactionsManager.commitTransaction();
-		
+		repositoryTxManager.commitTx();
+
 		// ASSERT
 		assertNotNull(transactionRead);
 		assertEquals(transactionToRead, transactionRead);
@@ -205,13 +207,13 @@ public class TransactionRepositoryJdbcTxImplTest {
 		List<Transaction> transactionsGet = new ArrayList<>();
 		transactionsGet = transactionRepositoryImplUnderTest.getTransactions("abc@test.com");
 
-		repositoryTransactionsManager.commitTransaction();
-		
+		repositoryTxManager.commitTx();
+
 		// ASSERT
 		assertNotNull(transactionsGet);
 		assertEquals(3, transactionsGet.size());
 
 		assertThat(transactionsGet).containsExactlyInAnyOrder(transactionToGet1, transactionToGet2, transactionToGet3);
 	}
-*/
+
 }
