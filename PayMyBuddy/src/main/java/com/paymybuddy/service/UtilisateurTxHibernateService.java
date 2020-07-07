@@ -7,24 +7,26 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.paymybuddy.entities.Utilisateur;
-import com.paymybuddy.factory.RepositoryFactory;
 import com.paymybuddy.repository.IUtilisateurRepository;
-import com.paymybuddy.repositorytransactionsmanager.RepositoryTxManagerHibernate;
+import com.paymybuddy.repositorytxmanager.RepositoryTxManagerHibernate;
 
 /**
- * Class managing the services related to an user using Hibernate Tx management.
+ * Class managing the services related to users using Hibernate Tx management.
  */
 public class UtilisateurTxHibernateService {
 
 	private static final Logger logger = LoggerFactory.getLogger(UtilisateurTxHibernateService.class);
 
-	private static String hibernateConfigurationFile = "hibernate.cfg.xml";
+	private RepositoryTxManagerHibernate repositoryTxManager;
 
-	private RepositoryTxManagerHibernate repositoryTxManager = RepositoryTxManagerHibernate
-			.getRepositoryTxManagerHibernate(hibernateConfigurationFile);
+	private IUtilisateurRepository utilisateurRepository;
 
-	private IUtilisateurRepository utilisateurRepository = RepositoryFactory
-			.getUtilisateurRepository(repositoryTxManager);
+	public UtilisateurTxHibernateService(RepositoryTxManagerHibernate repositoryTxManager,
+			IUtilisateurRepository utilisateurRepository) {
+		super();
+		this.repositoryTxManager = repositoryTxManager;
+		this.utilisateurRepository = utilisateurRepository;
+	}
 
 	/**
 	 * Method managing the registration on an user to the application.
@@ -65,7 +67,6 @@ public class UtilisateurTxHibernateService {
 
 			repositoryTxManager.rollbackTx();
 		} finally {
-			logger.error("Closing current session");
 
 			repositoryTxManager.closeCurrentSession();
 		}
@@ -74,7 +75,7 @@ public class UtilisateurTxHibernateService {
 	}
 
 	/**
-	 * Method managing the connection on an user to the application.
+	 * Method managing the connection of a user to the application.
 	 * 
 	 * @param email    The email of the user to connect
 	 * 
@@ -106,7 +107,6 @@ public class UtilisateurTxHibernateService {
 
 			repositoryTxManager.rollbackTx();
 		} finally {
-			logger.error("Closing current session");
 
 			repositoryTxManager.closeCurrentSession();
 		}
@@ -147,7 +147,7 @@ public class UtilisateurTxHibernateService {
 
 				repositoryTxManager.commitTx();
 
-				logger.info("Wire to account by Utilisateur {} for Amount {} : done", email, amount);
+				logger.info("Wire to account by Utilisateur {} for amount {} : done", email, amount);
 
 				wireToAccountDone = true;
 			}
@@ -156,7 +156,6 @@ public class UtilisateurTxHibernateService {
 
 			repositoryTxManager.rollbackTx();
 		} finally {
-			logger.error("Closing current session");
 
 			repositoryTxManager.closeCurrentSession();
 		}
@@ -201,7 +200,7 @@ public class UtilisateurTxHibernateService {
 
 					repositoryTxManager.commitTx();
 
-					logger.info("Withdrawal from account by Utilisateur {} for Amount = {} done", email, amount);
+					logger.info("Withdrawal from account by Utilisateur {} for amount = {} done", email, amount);
 
 					withdrawalFromAccountDone = true;
 				}
@@ -211,7 +210,6 @@ public class UtilisateurTxHibernateService {
 
 			repositoryTxManager.rollbackTx();
 		} finally {
-			logger.error("Closing current session");
 
 			repositoryTxManager.closeCurrentSession();
 		}
@@ -272,7 +270,6 @@ public class UtilisateurTxHibernateService {
 
 			repositoryTxManager.rollbackTx();
 		} finally {
-			logger.error("Closing current session");
 
 			repositoryTxManager.closeCurrentSession();
 		}

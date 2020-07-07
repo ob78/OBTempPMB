@@ -16,13 +16,13 @@ import com.paymybuddy.repository.TransactionRepositoryJpaImpl;
 import com.paymybuddy.repository.UtilisateurRepositoryJdbcImpl;
 import com.paymybuddy.repository.UtilisateurRepositoryJdbcTxImpl;
 import com.paymybuddy.repository.UtilisateurRepositoryJpaTxHibernateImpl;
+import com.paymybuddy.repositorytxmanager.RepositoryTxManagerHibernate;
+import com.paymybuddy.repositorytxmanager.RepositoryTxManagerJDBC;
 import com.paymybuddy.repository.UtilisateurRepositoryJpaImpl;
-import com.paymybuddy.repositorytransactionsmanager.RepositoryTxManagerHibernate;
-import com.paymybuddy.repositorytransactionsmanager.RepositoryTxManagerJDBC;
 
 /**
  * Class Factory in charge of the construction of Utilisateur repository and
- * Transaction repository for JDBC and JPA implementations
+ * Transaction repository.
  */
 public class RepositoryFactory {
 
@@ -83,13 +83,16 @@ public class RepositoryFactory {
 	 * 
 	 * @param repositoryManger The repositoryManger used to manage tx
 	 * 
-	 * @return The Transaction repository
+	 * @return The Transaction repository created
 	 */
 	public static ITransactionRepository getTransactionRepository(RepositoryTxManagerHibernate repositoryManger) {
 
-		transactionRepository = new TransactionRepositoryJpaTxHibernateImpl(repositoryManger);
+		if (transactionRepository == null) {
 
-		logger.info("Factory : Creation JPA Transaction Repository with Hibernate Tx management : OK");
+			transactionRepository = new TransactionRepositoryJpaTxHibernateImpl(repositoryManger);
+
+			logger.info("Factory : Creation JPA persistence Transaction Repository with Hibernate Tx management : OK");
+		}
 
 		return transactionRepository;
 	}
@@ -101,14 +104,16 @@ public class RepositoryFactory {
 	 * 
 	 * @param repositoryManger The repositoryManger used to manage tx
 	 * 
-	 * @return The Transaction repository
+	 * @return The Transaction repository created
 	 */
 	public static ITransactionRepository getTransactionRepository(RepositoryTxManagerJDBC repositoryManger) {
 
-		transactionRepository = new TransactionRepositoryJdbcTxImpl(repositoryManger);
+		if (transactionRepository == null) {
 
-		logger.info("Factory : Creation JDBC Transaction Repository with JDBC Tx management : OK");
+			transactionRepository = new TransactionRepositoryJdbcTxImpl(repositoryManger);
 
+			logger.info("Factory : Creation JDBC persistence Transaction Repository with JDBC Tx management : OK");
+		}
 		return transactionRepository;
 	}
 
@@ -124,7 +129,7 @@ public class RepositoryFactory {
 	 * @param properties     The path of the file containing properties for the
 	 *                       repository configuration
 	 * 
-	 * @return The Utilisateur repository
+	 * @return The Utilisateur repository 
 	 */
 	public static IUtilisateurRepository getUtilisateurRepository(String repositoryName, String properties) {
 
@@ -171,13 +176,16 @@ public class RepositoryFactory {
 	 * 
 	 * @param repositoryManger The repositoryManger used to manage tx
 	 * 
-	 * @return The Transaction repository
+	 * @return The Utilisateur repository created
 	 */
 	public static IUtilisateurRepository getUtilisateurRepository(RepositoryTxManagerHibernate repositoryManger) {
 
-		utilisateurRepository = new UtilisateurRepositoryJpaTxHibernateImpl(repositoryManger);
+		if (utilisateurRepository == null) {
 
-		logger.info("Factory : Creation JPA Utilisateur Repository with Hibernate Tx management : OK");
+			utilisateurRepository = new UtilisateurRepositoryJpaTxHibernateImpl(repositoryManger);
+
+			logger.info("Factory : Creation JPA persistence Utilisateur Repository with Hibernate Tx management : OK");
+		}
 
 		return utilisateurRepository;
 	}
@@ -189,13 +197,16 @@ public class RepositoryFactory {
 	 * 
 	 * @param repositoryManger The repositoryManger used to manage tx
 	 * 
-	 * @return The Transaction repository
+	 * @return The Utilisateur repository created
 	 */
 	public static IUtilisateurRepository getUtilisateurRepository(RepositoryTxManagerJDBC repositoryManger) {
 
-		utilisateurRepository = new UtilisateurRepositoryJdbcTxImpl(repositoryManger);
+		if (utilisateurRepository == null) {
 
-		logger.info("Factory : Creation JDBC Utilisateur Repository with JDBC Tx management : OK");
+			utilisateurRepository = new UtilisateurRepositoryJdbcTxImpl(repositoryManger);
+
+			logger.info("Factory : Creation JDBC persistence Utilisateur Repository with JDBC Tx management : OK");
+		}
 
 		return utilisateurRepository;
 	}

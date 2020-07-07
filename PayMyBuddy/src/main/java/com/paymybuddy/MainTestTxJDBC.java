@@ -11,7 +11,7 @@ import com.paymybuddy.entities.Utilisateur;
 import com.paymybuddy.factory.RepositoryFactory;
 import com.paymybuddy.repository.ITransactionRepository;
 import com.paymybuddy.repository.IUtilisateurRepository;
-import com.paymybuddy.repositorytransactionsmanager.RepositoryTxManagerJDBC;
+import com.paymybuddy.repositorytxmanager.RepositoryTxManagerJDBC;
 
 public class MainTestTxJDBC {
 

@@ -10,10 +10,9 @@ import org.slf4j.LoggerFactory;
 
 import com.paymybuddy.entities.Transaction;
 import com.paymybuddy.entities.Utilisateur;
-import com.paymybuddy.factory.RepositoryFactory;
 import com.paymybuddy.repository.ITransactionRepository;
 import com.paymybuddy.repository.IUtilisateurRepository;
-import com.paymybuddy.repositorytransactionsmanager.RepositoryTxManagerHibernate;
+import com.paymybuddy.repositorytxmanager.RepositoryTxManagerHibernate;
 
 /**
  * Class managing the services related to financial transactions using Hibernate
@@ -23,16 +22,18 @@ public class TransactionTxHibernateService {
 
 	private static final Logger logger = LoggerFactory.getLogger(TransactionTxHibernateService.class);
 
-	private static String hibernateConfigurationFile = "hibernate.cfg.xml";
+	private RepositoryTxManagerHibernate repositoryTxManager;
 
-	private RepositoryTxManagerHibernate repositoryTxManager = RepositoryTxManagerHibernate
-			.getRepositoryTxManagerHibernate(hibernateConfigurationFile);
+	private IUtilisateurRepository utilisateurRepository;
 
-	private IUtilisateurRepository utilisateurRepository = RepositoryFactory
-			.getUtilisateurRepository(repositoryTxManager);
+	private ITransactionRepository transactionRepository;
 
-	private ITransactionRepository transactionRepository = RepositoryFactory
-			.getTransactionRepository(repositoryTxManager);
+	public TransactionTxHibernateService(RepositoryTxManagerHibernate repositoryTxManager,
+			IUtilisateurRepository utilisateurRepository, ITransactionRepository transactionRepository) {
+		this.repositoryTxManager = repositoryTxManager;
+		this.utilisateurRepository = utilisateurRepository;
+		this.transactionRepository = transactionRepository;
+	}
 
 	/**
 	 * Return all financial transactions made by an user.
@@ -62,7 +63,6 @@ public class TransactionTxHibernateService {
 
 			repositoryTxManager.rollbackTx();
 		} finally {
-			logger.error("Closing current session");
 
 			repositoryTxManager.closeCurrentSession();
 		}
@@ -88,18 +88,21 @@ public class TransactionTxHibernateService {
 		try {
 			repositoryTxManager.openCurrentSessionWithTx();
 
-			if (utilisateurRepository.read(initiateurEmail) == null) {
+			Utilisateur utilisateur = utilisateurRepository.read(initiateurEmail);
+			Utilisateur connection = utilisateurRepository.read(contrepartieEmail);
+
+			if (utilisateur == null) {
 				logger.error("Make a transaction : Utilisateur initiateur {} does not exist", initiateurEmail);
-			} else if (utilisateurRepository.read(contrepartieEmail) == null) {
+			} else if (connection == null) {
 				logger.error("Make a transaction : Utilisateur contrepartie {} does not exist", contrepartieEmail);
 			} else {
-				Utilisateur utilisateur = utilisateurRepository.read(initiateurEmail);
+
 				Set<Utilisateur> utilisateurConnections = new HashSet<>();
 				utilisateurConnections = utilisateur.getConnection();
 
-				Utilisateur connection = utilisateurRepository.read(contrepartieEmail);
 				if (!utilisateurConnections.contains(connection)) {
-					logger.error("Make a transaction : Utilisateur {} not connected", initiateurEmail);
+					logger.error("Make a transaction : Utilisateur {} not connected with {}", initiateurEmail,
+							contrepartieEmail);
 				} else if (utilisateur.getSolde() < montant) {
 					logger.error(
 							"Make a transaction : Utilisateur {} solde = {} not sufficient for transaction amount = {}",
@@ -120,7 +123,7 @@ public class TransactionTxHibernateService {
 					repositoryTxManager.commitTx();
 
 					logger.info(
-							"Transaction made by Utilisateur intiatateur {} to Utilisateur contrepartie {} for amount = {} : done",
+							"Transaction made by Utilisateur intitiateur {} to Utilisateur contrepartie {} for amount = {} : done",
 							initiateurEmail, contrepartieEmail, montant);
 
 					transactionDone = true;
@@ -131,13 +134,10 @@ public class TransactionTxHibernateService {
 
 			repositoryTxManager.rollbackTx();
 		} finally {
-			logger.error("Closing current session");
 
 			repositoryTxManager.closeCurrentSession();
 		}
 
 		return transactionDone;
-
 	}
-
 }

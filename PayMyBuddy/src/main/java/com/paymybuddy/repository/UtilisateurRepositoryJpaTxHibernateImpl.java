@@ -4,10 +4,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.paymybuddy.entities.Utilisateur;
-import com.paymybuddy.repositorytransactionsmanager.RepositoryTxManagerHibernate;
+import com.paymybuddy.repositorytxmanager.RepositoryTxManagerHibernate;
 
 /**
- * Class managing the data persistence for the user using JPA implementation for
+ * Class managing the data persistence for user using JPA implementation for
  * persistence and Hibernate for Tx management.
  */
 public class UtilisateurRepositoryJpaTxHibernateImpl implements IUtilisateurRepository {
@@ -18,7 +18,6 @@ public class UtilisateurRepositoryJpaTxHibernateImpl implements IUtilisateurRepo
 
 	public UtilisateurRepositoryJpaTxHibernateImpl(RepositoryTxManagerHibernate repositoryTxManager) {
 		this.repositoryTxManager = repositoryTxManager;
-		logger.info("UtilisateurRepositoryJpaTxHibernateImpl successfully created.");
 	}
 
 	/**
@@ -29,8 +28,11 @@ public class UtilisateurRepositoryJpaTxHibernateImpl implements IUtilisateurRepo
 	@Override
 	public void create(Utilisateur utilisateur) {
 
-		repositoryTxManager.getCurrentSession().save(utilisateur);
+		//HIBERNATE
+		//repositoryTxManager.getCurrentSession().save(utilisateur);
 
+		//JPA
+		repositoryTxManager.getCurrentSession().persist(utilisateur);
 	}
 
 	/**
@@ -41,6 +43,10 @@ public class UtilisateurRepositoryJpaTxHibernateImpl implements IUtilisateurRepo
 	@Override
 	public void update(Utilisateur utilisateur) {
 
+		//HIBERNATE
+		//repositoryTxManager.getCurrentSession().update(utilisateur);
+		
+		//JPA
 		repositoryTxManager.getCurrentSession().merge(utilisateur);
 
 	}
@@ -55,8 +61,12 @@ public class UtilisateurRepositoryJpaTxHibernateImpl implements IUtilisateurRepo
 	@Override
 	public Utilisateur read(String email) {
 
-		Utilisateur utilisateur = repositoryTxManager.getCurrentSession().get(Utilisateur.class, email);
+		//HIBERNATE
+		//Utilisateur utilisateur = repositoryTxManager.getCurrentSession().get(Utilisateur.class, email);
 
+		//JPA
+		Utilisateur utilisateur = repositoryTxManager.getCurrentSession().find(Utilisateur.class, email);
+	
 		return utilisateur;
 	}
 
@@ -68,10 +78,13 @@ public class UtilisateurRepositoryJpaTxHibernateImpl implements IUtilisateurRepo
 	@Override
 	public void delete(String email) {
 
-		Utilisateur utilisateur = repositoryTxManager.getCurrentSession().get(Utilisateur.class, email);
+		Utilisateur utilisateur = repositoryTxManager.getCurrentSession().find(Utilisateur.class, email);
 
-		repositoryTxManager.getCurrentSession().delete(utilisateur);
+		//HIBERNATE
+		//repositoryTxManager.getCurrentSession().delete(utilisateur);
 
+		//JPA
+		repositoryTxManager.getCurrentSession().remove(utilisateur);
 	}
 
 	/**

@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
 import com.paymybuddy.entities.Transaction;
 import com.paymybuddy.entities.Utilisateur;
 import com.paymybuddy.factory.RepositoryFactory;
-import com.paymybuddy.repositorytransactionsmanager.RepositoryTxManagerJDBC;
+import com.paymybuddy.repositorytxmanager.RepositoryTxManagerJDBC;
 
 /**
  * Class managing the data persistence for the financial transaction.

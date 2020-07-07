@@ -1,4 +1,4 @@
-package com.paymybuddy.repositorytransactionsmanager;
+package com.paymybuddy.repositorytxmanager;
 
 import java.io.IOException;
 import java.io.InputStream;

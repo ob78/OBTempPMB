@@ -1,4 +1,4 @@
-package com.paymybuddy.repositorytransactionsmanager;
+package com.paymybuddy.repositorytxmanager;
 
 import java.io.File;
 
@@ -8,11 +8,15 @@ import org.hibernate.Transaction;
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * Class in charge of the Tx management, Hibernate implementation.
+ * Class in charge of the Tx management with Hibernate implementation.
  */
 public class RepositoryTxManagerHibernate {
+
+	private static final Logger logger = LoggerFactory.getLogger(RepositoryTxManagerHibernate.class);
 
 	private Session currentSession;
 
@@ -34,12 +38,15 @@ public class RepositoryTxManagerHibernate {
 	 * @return The RepositoryTxManagerHibernate
 	 */
 	public static RepositoryTxManagerHibernate getRepositoryTxManagerHibernate(String configurationFile) {
+
 		if (repositoryTxManagerHibernate == null) {
+
 			repositoryTxManagerHibernate = new RepositoryTxManagerHibernate(configurationFile);
-			return repositoryTxManagerHibernate;
-		} else {
-			return repositoryTxManagerHibernate;
+
+			logger.info("Creation of Tx Hibernate manager : OK");
 		}
+
+		return repositoryTxManagerHibernate;
 	}
 
 	// private static SessionFactory getSessionFactory() {
@@ -88,7 +95,7 @@ public class RepositoryTxManagerHibernate {
 	/**
 	 * Commit Tx and close current Session.
 	 */
-	public void commitTxAndCloseCurrentSessionWithTx() {
+	public void commitTxAndCloseCurrentSession() {
 		currentTx.commit();
 		currentSession.close();
 	}
@@ -96,7 +103,7 @@ public class RepositoryTxManagerHibernate {
 	/**
 	 * Rollback Tx and close current Session.
 	 */
-	public void rollbackTxAndCloseCurrentSessionwithTx() {
+	public void rollbackTxAndCloseCurrentSession() {
 		currentTx.rollback();
 		currentSession.close();
 	}
