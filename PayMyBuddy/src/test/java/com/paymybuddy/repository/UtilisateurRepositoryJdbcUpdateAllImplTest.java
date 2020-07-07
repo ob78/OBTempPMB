@@ -8,6 +8,7 @@ import java.util.Set;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
@@ -17,7 +18,7 @@ import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import com.paymybuddy.configuration.RepositoryDataSource;
 import com.paymybuddy.entities.Utilisateur;
 import com.paymybuddy.factory.RepositoryFactory;
-
+@Disabled
 public class UtilisateurRepositoryJdbcUpdateAllImplTest {
 
 	private static String propertiesFilePathTest = "paymybuddyTest.properties";
