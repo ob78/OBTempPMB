@@ -70,7 +70,7 @@ public class TransactionTxHibernateServiceTest {
 	}
 
 	@Test
-	public void getAllTransactions() {
+	public void getTransactions() {
 		// ARRANGE
 		repositoryTxManager.openCurrentSessionWithTx();
 		Transaction transactionToGet1 = new Transaction();
@@ -131,10 +131,10 @@ public class TransactionTxHibernateServiceTest {
 		Utilisateur contrepartieAfterNewTransaction = utilisateurRepositoryImpl.read("def@test.com");
 		repositoryTxManager.commitTxAndCloseCurrentSession();
 
-		assertEquals((double) (initiateurBeforeNewTransaction.getSolde() - 10d),
-				initiateurAfterNewTransaction.getSolde());
-		assertEquals((double) (contrepartieBeforeNewTransaction.getSolde() + 10d),
-				contrepartieAfterNewTransaction.getSolde());
+		assertEquals((double)(initiateurBeforeNewTransaction.getSolde() - 10d),
+				(double)(initiateurAfterNewTransaction.getSolde()));
+		assertEquals((double)(contrepartieBeforeNewTransaction.getSolde() + 10d),
+				(double)(contrepartieAfterNewTransaction.getSolde()));
 
 		List<Transaction> listTransactionsAfterNewTransaction = new ArrayList<>();
 		listTransactionsAfterNewTransaction = transactionTxHibernateServiceUnderTest.getAllTransactions("abc@test.com");
@@ -146,5 +146,122 @@ public class TransactionTxHibernateServiceTest {
 		assertEquals(10d, newTransaction.getMontant());
 		assertEquals(initiateurBeforeNewTransaction.getEmail(), newTransaction.getInitiateur().getEmail());
 		assertEquals(contrepartieBeforeNewTransaction.getEmail(), newTransaction.getContrepartie().getEmail());
+	}
+
+	@Test
+	public void makeATransactionWhenInitiateurNotExist() {
+		// ARRANGE
+		repositoryTxManager.openCurrentSessionWithTx();
+		Utilisateur contrepartieBeforeNewTransaction = utilisateurRepositoryImpl.read("def@test.com");
+		repositoryTxManager.commitTxAndCloseCurrentSession();
+
+		// ACT
+		boolean result = transactionTxHibernateServiceUnderTest.makeATransaction("UtilisateurInitiateurNotExist",
+				contrepartieBeforeNewTransaction.getEmail(), 10d);
+
+		// ASSERT
+		assertFalse(result);
+
+		repositoryTxManager.openCurrentSessionWithTx();
+		Utilisateur contrepartieAfterNewTransaction = utilisateurRepositoryImpl.read("def@test.com");
+		repositoryTxManager.commitTxAndCloseCurrentSession();
+
+		assertEquals(contrepartieBeforeNewTransaction.getSolde(), contrepartieAfterNewTransaction.getSolde());
+	}
+
+	@Test
+	public void makeATransactionWhenContrepartieNotExist() {
+		// ARRANGE
+		repositoryTxManager.openCurrentSessionWithTx();
+		Utilisateur initiateurBeforeNewTransaction = utilisateurRepositoryImpl.read("abc@test.com");
+		repositoryTxManager.commitTxAndCloseCurrentSession();
+
+		List<Transaction> listTransactionsBeforeNewTransaction = new ArrayList<>();
+		listTransactionsBeforeNewTransaction = transactionTxHibernateServiceUnderTest
+				.getAllTransactions("abc@test.com");
+
+		// ACT
+		boolean result = transactionTxHibernateServiceUnderTest
+				.makeATransaction(initiateurBeforeNewTransaction.getEmail(), "UtilisateurContrepartieNotExist", 10d);
+
+		// ASSERT
+		assertFalse(result);
+
+		repositoryTxManager.openCurrentSessionWithTx();
+		Utilisateur initiateurAfterNewTransaction = utilisateurRepositoryImpl.read("abc@test.com");
+		repositoryTxManager.commitTxAndCloseCurrentSession();
+
+		assertEquals(initiateurBeforeNewTransaction.getSolde(), initiateurAfterNewTransaction.getSolde());
+
+		List<Transaction> listTransactionsAfterNewTransaction = new ArrayList<>();
+		listTransactionsAfterNewTransaction = transactionTxHibernateServiceUnderTest.getAllTransactions("abc@test.com");
+
+		assertEquals(listTransactionsBeforeNewTransaction.size(), listTransactionsAfterNewTransaction.size());
+	}
+
+	@Test
+	public void makeATransactionWhenInitiateurAndContrepartieExistAndAreNotConnected() {
+		// ARRANGE
+		repositoryTxManager.openCurrentSessionWithTx();
+		Utilisateur initiateurBeforeNewTransaction = utilisateurRepositoryImpl.read("abc@test.com");
+		Utilisateur contrepartieBeforeNewTransaction = utilisateurRepositoryImpl.read("klm@test.com");
+		repositoryTxManager.commitTxAndCloseCurrentSession();
+
+		List<Transaction> listTransactionsBeforeNewTransaction = new ArrayList<>();
+		listTransactionsBeforeNewTransaction = transactionTxHibernateServiceUnderTest
+				.getAllTransactions("abc@test.com");
+
+		// ACT
+		boolean result = transactionTxHibernateServiceUnderTest.makeATransaction(
+				initiateurBeforeNewTransaction.getEmail(), contrepartieBeforeNewTransaction.getEmail(), 10d);
+
+		// ASSERT
+		assertFalse(result);
+
+		repositoryTxManager.openCurrentSessionWithTx();
+		Utilisateur initiateurAfterNewTransaction = utilisateurRepositoryImpl.read("abc@test.com");
+		Utilisateur contrepartieAfterNewTransaction = utilisateurRepositoryImpl.read("klm@test.com");
+		repositoryTxManager.commitTxAndCloseCurrentSession();
+
+		assertEquals(initiateurBeforeNewTransaction.getSolde(), initiateurAfterNewTransaction.getSolde());
+		assertEquals(contrepartieBeforeNewTransaction.getSolde(), contrepartieAfterNewTransaction.getSolde());
+
+		List<Transaction> listTransactionsAfterNewTransaction = new ArrayList<>();
+		listTransactionsAfterNewTransaction = transactionTxHibernateServiceUnderTest.getAllTransactions("abc@test.com");
+
+		assertEquals(listTransactionsBeforeNewTransaction.size(), listTransactionsAfterNewTransaction.size());
+	}
+
+	@Test
+	public void makeATransactionWhenInitiateurAndContrepartieExistAndAreConnectedAndSoldeNotSufficient() {
+		// ARRANGE
+		repositoryTxManager.openCurrentSessionWithTx();
+		Utilisateur initiateurBeforeNewTransaction = utilisateurRepositoryImpl.read("abc@test.com");
+		Utilisateur contrepartieBeforeNewTransaction = utilisateurRepositoryImpl.read("def@test.com");
+		repositoryTxManager.commitTxAndCloseCurrentSession();
+
+		List<Transaction> listTransactionsBeforeNewTransaction = new ArrayList<>();
+		listTransactionsBeforeNewTransaction = transactionTxHibernateServiceUnderTest
+				.getAllTransactions("abc@test.com");
+
+		// ACT
+		boolean result = transactionTxHibernateServiceUnderTest.makeATransaction(
+				initiateurBeforeNewTransaction.getEmail(), contrepartieBeforeNewTransaction.getEmail(), 1000d);
+
+		// ASSERT
+		assertFalse(result);
+
+		repositoryTxManager.openCurrentSessionWithTx();
+		Utilisateur initiateurAfterNewTransaction = utilisateurRepositoryImpl.read("abc@test.com");
+		Utilisateur contrepartieAfterNewTransaction = utilisateurRepositoryImpl.read("def@test.com");
+		repositoryTxManager.commitTxAndCloseCurrentSession();
+
+		assertEquals(initiateurBeforeNewTransaction.getSolde(), initiateurAfterNewTransaction.getSolde());
+		assertEquals(contrepartieBeforeNewTransaction.getSolde(), contrepartieAfterNewTransaction.getSolde());
+
+		List<Transaction> listTransactionsAfterNewTransaction = new ArrayList<>();
+		listTransactionsAfterNewTransaction = transactionTxHibernateServiceUnderTest.getAllTransactions("abc@test.com");
+
+		assertEquals(listTransactionsBeforeNewTransaction.size(), listTransactionsAfterNewTransaction.size());
 	}
 }
