@@ -2,13 +2,10 @@ package com.paymybuddy.repository;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,9 +22,8 @@ import com.paymybuddy.factory.RepositoryFactory;
 import com.paymybuddy.factory.ServiceFactory;
 import com.paymybuddy.repositorytxmanager.RepositoryTxManagerHibernate;
 import com.paymybuddy.service.TransactionTxHibernateService;
-import com.paymybuddy.service.UtilisateurTxHibernateService;
 
-public class TransactionTxHibernateServiceTest {
+public class TransactionTxHibernateServiceIntegrationTest {
 
 	private static String hibernateConfigFile = "src/test/resources/hibernateTest.cfg.xml";
 
@@ -56,7 +52,7 @@ public class TransactionTxHibernateServiceTest {
 
 	@BeforeEach
 	private void setUpPerTest() {
-		// We clear the database
+		// We prepare the database
 		DatabasePopulatorUtils.execute(resourceDatabasePopulator, dataSource);
 
 		repositoryTxManager = RepositoryTxManagerHibernate.getRepositoryTxManagerHibernate(hibernateConfigFile);
@@ -70,7 +66,7 @@ public class TransactionTxHibernateServiceTest {
 	}
 
 	@Test
-	public void getTransactions() {
+	public void getTransactionsWhenUtilisateurExist() {
 		// ARRANGE
 		repositoryTxManager.openCurrentSessionWithTx();
 		Transaction transactionToGet1 = new Transaction();
@@ -97,14 +93,24 @@ public class TransactionTxHibernateServiceTest {
 
 		// ACT
 		List<Transaction> transactionsGet = new ArrayList<>();
-		transactionsGet = transactionTxHibernateServiceUnderTest.getAllTransactions("abc@test.com");
+		transactionsGet = transactionTxHibernateServiceUnderTest.getTransactions("abc@test.com");
 
 		// ASSERT
-		assertNotNull(transactionsGet);
 		assertEquals(3, transactionsGet.size());
 
 		// assertThat(transactionsGet).containsExactlyInAnyOrder(transactionToGet1,
 		// transactionToGet2, transactionToGet3);
+	}
+
+	@Test
+	public void getTransactionsWhenUtilisateurNotExist() {
+		// ARRANGE
+		// ACT
+		List<Transaction> transactionsGet = new ArrayList<>();
+		transactionsGet = transactionTxHibernateServiceUnderTest.getTransactions("UtilisateurNotExist");
+
+		// ASSERT
+		assertTrue(transactionsGet.isEmpty());
 	}
 
 	@Test
@@ -116,8 +122,7 @@ public class TransactionTxHibernateServiceTest {
 		repositoryTxManager.commitTxAndCloseCurrentSession();
 
 		List<Transaction> listTransactionsBeforeNewTransaction = new ArrayList<>();
-		listTransactionsBeforeNewTransaction = transactionTxHibernateServiceUnderTest
-				.getAllTransactions("abc@test.com");
+		listTransactionsBeforeNewTransaction = transactionTxHibernateServiceUnderTest.getTransactions("abc@test.com");
 
 		// ACT
 		boolean result = transactionTxHibernateServiceUnderTest.makeATransaction(
@@ -131,13 +136,13 @@ public class TransactionTxHibernateServiceTest {
 		Utilisateur contrepartieAfterNewTransaction = utilisateurRepositoryImpl.read("def@test.com");
 		repositoryTxManager.commitTxAndCloseCurrentSession();
 
-		assertEquals((double)(initiateurBeforeNewTransaction.getSolde() - 10d),
-				(double)(initiateurAfterNewTransaction.getSolde()));
-		assertEquals((double)(contrepartieBeforeNewTransaction.getSolde() + 10d),
-				(double)(contrepartieAfterNewTransaction.getSolde()));
+		assertEquals((double) (initiateurBeforeNewTransaction.getSolde() - 10d),
+				(double) (initiateurAfterNewTransaction.getSolde()));
+		assertEquals((double) (contrepartieBeforeNewTransaction.getSolde() + 10d),
+				(double) (contrepartieAfterNewTransaction.getSolde()));
 
 		List<Transaction> listTransactionsAfterNewTransaction = new ArrayList<>();
-		listTransactionsAfterNewTransaction = transactionTxHibernateServiceUnderTest.getAllTransactions("abc@test.com");
+		listTransactionsAfterNewTransaction = transactionTxHibernateServiceUnderTest.getTransactions("abc@test.com");
 
 		assertEquals(listTransactionsBeforeNewTransaction.size() + 1, listTransactionsAfterNewTransaction.size());
 
@@ -177,8 +182,7 @@ public class TransactionTxHibernateServiceTest {
 		repositoryTxManager.commitTxAndCloseCurrentSession();
 
 		List<Transaction> listTransactionsBeforeNewTransaction = new ArrayList<>();
-		listTransactionsBeforeNewTransaction = transactionTxHibernateServiceUnderTest
-				.getAllTransactions("abc@test.com");
+		listTransactionsBeforeNewTransaction = transactionTxHibernateServiceUnderTest.getTransactions("abc@test.com");
 
 		// ACT
 		boolean result = transactionTxHibernateServiceUnderTest
@@ -194,7 +198,7 @@ public class TransactionTxHibernateServiceTest {
 		assertEquals(initiateurBeforeNewTransaction.getSolde(), initiateurAfterNewTransaction.getSolde());
 
 		List<Transaction> listTransactionsAfterNewTransaction = new ArrayList<>();
-		listTransactionsAfterNewTransaction = transactionTxHibernateServiceUnderTest.getAllTransactions("abc@test.com");
+		listTransactionsAfterNewTransaction = transactionTxHibernateServiceUnderTest.getTransactions("abc@test.com");
 
 		assertEquals(listTransactionsBeforeNewTransaction.size(), listTransactionsAfterNewTransaction.size());
 	}
@@ -208,8 +212,7 @@ public class TransactionTxHibernateServiceTest {
 		repositoryTxManager.commitTxAndCloseCurrentSession();
 
 		List<Transaction> listTransactionsBeforeNewTransaction = new ArrayList<>();
-		listTransactionsBeforeNewTransaction = transactionTxHibernateServiceUnderTest
-				.getAllTransactions("abc@test.com");
+		listTransactionsBeforeNewTransaction = transactionTxHibernateServiceUnderTest.getTransactions("abc@test.com");
 
 		// ACT
 		boolean result = transactionTxHibernateServiceUnderTest.makeATransaction(
@@ -227,7 +230,7 @@ public class TransactionTxHibernateServiceTest {
 		assertEquals(contrepartieBeforeNewTransaction.getSolde(), contrepartieAfterNewTransaction.getSolde());
 
 		List<Transaction> listTransactionsAfterNewTransaction = new ArrayList<>();
-		listTransactionsAfterNewTransaction = transactionTxHibernateServiceUnderTest.getAllTransactions("abc@test.com");
+		listTransactionsAfterNewTransaction = transactionTxHibernateServiceUnderTest.getTransactions("abc@test.com");
 
 		assertEquals(listTransactionsBeforeNewTransaction.size(), listTransactionsAfterNewTransaction.size());
 	}
@@ -241,8 +244,7 @@ public class TransactionTxHibernateServiceTest {
 		repositoryTxManager.commitTxAndCloseCurrentSession();
 
 		List<Transaction> listTransactionsBeforeNewTransaction = new ArrayList<>();
-		listTransactionsBeforeNewTransaction = transactionTxHibernateServiceUnderTest
-				.getAllTransactions("abc@test.com");
+		listTransactionsBeforeNewTransaction = transactionTxHibernateServiceUnderTest.getTransactions("abc@test.com");
 
 		// ACT
 		boolean result = transactionTxHibernateServiceUnderTest.makeATransaction(
@@ -260,7 +262,7 @@ public class TransactionTxHibernateServiceTest {
 		assertEquals(contrepartieBeforeNewTransaction.getSolde(), contrepartieAfterNewTransaction.getSolde());
 
 		List<Transaction> listTransactionsAfterNewTransaction = new ArrayList<>();
-		listTransactionsAfterNewTransaction = transactionTxHibernateServiceUnderTest.getAllTransactions("abc@test.com");
+		listTransactionsAfterNewTransaction = transactionTxHibernateServiceUnderTest.getTransactions("abc@test.com");
 
 		assertEquals(listTransactionsBeforeNewTransaction.size(), listTransactionsAfterNewTransaction.size());
 	}
