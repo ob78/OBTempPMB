@@ -226,14 +226,14 @@ public class TransactionRepositoryJpaTxHibernateImplITest {
 
 		// ASSERT
 		assertEquals(3, transactionsGet.size());
-		
+
 		Iterator<Transaction> iter = transactionsGet.iterator();
 
 		Transaction transactionGet1 = iter.next();
 		Transaction transactionGet2 = iter.next();
 		Transaction transactionGet3 = iter.next();
 		// TransactionGet3 = TransactionToGet1 as transactions are get with DESC order
-		
+
 		assertEquals(transactionToGet1.getInitiateur().getEmail(), transactionGet3.getInitiateur().getEmail());
 		assertEquals(transactionToGet1.getInitiateur().getPassword(), transactionGet3.getInitiateur().getPassword());
 		assertEquals(transactionToGet1.getInitiateur().getSolde(), transactionGet3.getInitiateur().getSolde());

@@ -180,9 +180,10 @@ public class TransactionTxHibernateServiceITest {
 		Utilisateur contrepartieAfterNewTransaction = utilisateurRepositoryImpl.read("def@test.com");
 		repositoryTxManager.commitTxAndCloseCurrentSession();
 
-		assertEquals((double) (initiateurBeforeNewTransaction.getSolde() - 10d),
+		assertEquals((double) (initiateurBeforeNewTransaction.getSolde() - 10),
 				(double) (initiateurAfterNewTransaction.getSolde()));
-		assertEquals((double) (contrepartieBeforeNewTransaction.getSolde() + 10d),
+		// connection get the amount of the transaction minus the commission of 0.5%
+		assertEquals((double) (contrepartieBeforeNewTransaction.getSolde() + 10 * (1 - 0.005)),
 				(double) (contrepartieAfterNewTransaction.getSolde()));
 
 		List<Transaction> listTransactionsAfterNewTransaction = new ArrayList<>();

@@ -113,7 +113,8 @@ public class TransactionTxHibernateService {
 								initiateurEmail, utilisateur.getSolde(), montant);
 					} else {
 						utilisateur.setSolde(utilisateur.getSolde() - montant);
-						connection.setSolde(connection.getSolde() + montant);
+						// connection get the amount of the transaction minus the commission of 0.5%
+						connection.setSolde(connection.getSolde() + montant*(1-0.005));
 						utilisateurRepository.update(utilisateur);
 						utilisateurRepository.update(connection);
 

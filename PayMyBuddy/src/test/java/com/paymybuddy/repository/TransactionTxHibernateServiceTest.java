@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
@@ -41,12 +40,10 @@ public class TransactionTxHibernateServiceTest {
 
 	@Mock
 	private ITransactionRepository transactionRepositoryMock;
-
-	/*
-	@Mock
-	private ServiceFactory serviceFactoryMock;
-	*/
-		
+	
+	// @Mock 
+	// private ServiceFactory serviceFactoryMock;
+	
 	private TransactionTxHibernateService transactionTxHibernateServiceUnderTest;
 
 	@BeforeEach
@@ -54,19 +51,22 @@ public class TransactionTxHibernateServiceTest {
 
 		repositoryTxManager = RepositoryTxManagerHibernate.getRepositoryTxManagerHibernate(hibernateConfigFile);
 
-		//reset(utilisateurRepositoryMock);
-		
-		//reset(transactionRepositoryMock);
-		
+		// reset(utilisateurRepositoryMock);
+
+		// reset(transactionRepositoryMock);
+
 		transactionTxHibernateServiceUnderTest = ServiceFactory.getTransactionService(repositoryTxManager,
 				utilisateurRepositoryMock, transactionRepositoryMock);
-		
+
 		/*
-		when(ServiceFactory.getTransactionService(repositoryTxManager, utilisateurRepositoryMock, transactionRepositoryMock)).thenReturn(new TransactionTxHibernateService(repositoryTxManager, utilisateurRepositoryMock,
-				transactionRepositoryMock));
-		*/
-		
-		// doReturn(transactionTxHibernateServiceUnderTest).when(serviceFactoryMock).getTransactionService(repositoryTxManager, utilisateurRepositoryMock, transactionRepositoryMock);
+		 * when(ServiceFactory.getTransactionService(repositoryTxManager,
+		 * utilisateurRepositoryMock, transactionRepositoryMock)).thenReturn(new
+		 * TransactionTxHibernateService(repositoryTxManager, utilisateurRepositoryMock,
+		 * transactionRepositoryMock));
+		 */
+
+		// doReturn(transactionTxHibernateServiceUnderTest).when(serviceFactoryMock).getTransactionService(repositoryTxManager,
+		// utilisateurRepositoryMock, transactionRepositoryMock);
 
 	}
 
@@ -74,10 +74,10 @@ public class TransactionTxHibernateServiceTest {
 	public void getTransactionsWhenUtilisateurExist() {
 		// ARRANGE
 		/*
-		reset(utilisateurRepositoryMock);
-		
-		reset(transactionRepositoryMock);
-		*/
+		 * reset(utilisateurRepositoryMock);
+		 * 
+		 * reset(transactionRepositoryMock);
+		 */
 		Utilisateur initiateur1 = new Utilisateur();
 		initiateur1.setEmail("abc@test.com");
 		initiateur1.setPassword("abc");

@@ -251,7 +251,7 @@ public class UtilisateurTxHibernateServiceITest {
 		Utilisateur utilisateurWiredToAccount = utilisateurRepositoryImpl.read(utilisateurToWireToAccount.getEmail());
 		repositoryTxManager.commitTxAndCloseCurrentSession();
 
-		assertEquals((double) (utilisateurToWireToAccount.getSolde() + 10d),
+		assertEquals((double) (utilisateurToWireToAccount.getSolde() + 10),
 				(double) utilisateurWiredToAccount.getSolde());
 	}
 
