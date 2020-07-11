@@ -21,7 +21,11 @@ import com.paymybuddy.entities.Utilisateur;
 import com.paymybuddy.factory.RepositoryFactory;
 import com.paymybuddy.repositorytxmanager.RepositoryTxManagerHibernate;
 
-public class UtilisateurRepositoryJpaTxHibernateImplTest {
+/**
+ * Class including integration (with the database) tests for the
+ * UtilisateurRepositoryJpaTxHibernateImpl Class.
+ */
+public class UtilisateurRepositoryJpaTxHibernateImplITest {
 
 	private static String hibernateConfigFile = "src/test/resources/hibernateTest.cfg.xml";
 
@@ -319,7 +323,6 @@ public class UtilisateurRepositoryJpaTxHibernateImplTest {
 				.read(utilisateurToAddConnection.getEmail());
 		Set<Utilisateur> connectionsUtilisateur = utilisateurConnectionAdded.getConnection();
 		Utilisateur connectionAdded = connectionsUtilisateur.iterator().next();
-		// examples.stream().findFirst().get()
 
 		assertEquals(1, connectionsUtilisateur.size());
 

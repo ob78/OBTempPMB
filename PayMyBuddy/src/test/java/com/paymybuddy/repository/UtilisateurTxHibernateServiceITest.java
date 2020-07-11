@@ -22,7 +22,11 @@ import com.paymybuddy.factory.ServiceFactory;
 import com.paymybuddy.repositorytxmanager.RepositoryTxManagerHibernate;
 import com.paymybuddy.service.UtilisateurTxHibernateService;
 
-public class UtilisateurTxHibernateServiceTest {
+/**
+ * Class including integration tests (with the database) for the
+ * UtilisateurTxHibernateService Class.
+ */
+public class UtilisateurTxHibernateServiceITest {
 
 	private static String hibernateConfigFile = "src/test/resources/hibernateTest.cfg.xml";
 
