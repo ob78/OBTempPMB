@@ -3,8 +3,13 @@ package com.paymybuddy.repository;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
@@ -167,6 +172,8 @@ public class TransactionTxHibernateServiceTest {
 		assertEquals(transactionToGet3.getContrepartie().getSolde(), transactionGet1.getContrepartie().getSolde());
 
 		assertEquals(transactionToGet3.getMontant(), transactionGet1.getMontant());
+		
+		verify(transactionRepositoryMock, times(1)).getTransactions(initiateur.getEmail());
 	}
 
 	@Test
@@ -181,6 +188,7 @@ public class TransactionTxHibernateServiceTest {
 
 		// ASSERT
 		assertTrue(transactionsGet.isEmpty());
+		verify(transactionRepositoryMock, never()).getTransactions(anyString());
 	}
 
 	@Test
@@ -230,6 +238,8 @@ public class TransactionTxHibernateServiceTest {
 
 		// ASSERT
 		assertTrue(result);
+		verify(utilisateurRepositoryMock, times(2)).update(any(Utilisateur.class));
+		verify(transactionRepositoryMock, times(1)).create(transaction);
 	}
 
 	@Test
@@ -260,6 +270,8 @@ public class TransactionTxHibernateServiceTest {
 
 		// ASSERT
 		assertFalse(result);
+		verify(utilisateurRepositoryMock, never()).update(any(Utilisateur.class));
+		verify(transactionRepositoryMock, never()).create(any(Transaction.class));
 	}
 	
 	@Test
@@ -280,6 +292,8 @@ public class TransactionTxHibernateServiceTest {
 
 		// ASSERT
 		assertFalse(result);
+		verify(utilisateurRepositoryMock, never()).update(any(Utilisateur.class));
+		verify(transactionRepositoryMock, never()).create(any(Transaction.class));
 	}
 	
 	@Test
@@ -300,6 +314,8 @@ public class TransactionTxHibernateServiceTest {
 
 		// ASSERT
 		assertFalse(result);
+		verify(utilisateurRepositoryMock, never()).update(any(Utilisateur.class));
+		verify(transactionRepositoryMock, never()).create(any(Transaction.class));
 	}
 
 	@Test
@@ -330,6 +346,8 @@ public class TransactionTxHibernateServiceTest {
 
 		// ASSERT
 		assertFalse(result);
+		verify(utilisateurRepositoryMock, never()).update(any(Utilisateur.class));
+		verify(transactionRepositoryMock, never()).create(any(Transaction.class));
 	}
 
 	@Test
@@ -364,6 +382,8 @@ public class TransactionTxHibernateServiceTest {
 
 		// ASSERT
 		assertFalse(result);
+		verify(utilisateurRepositoryMock, never()).update(any(Utilisateur.class));
+		verify(transactionRepositoryMock, never()).create(any(Transaction.class));
 	}
 
 	@Test
@@ -376,6 +396,8 @@ public class TransactionTxHibernateServiceTest {
 
 		// ASSERT
 		assertFalse(result);
+		verify(utilisateurRepositoryMock, never()).update(any(Utilisateur.class));
+		verify(transactionRepositoryMock, never()).create(any(Transaction.class));
 	}
 
 }

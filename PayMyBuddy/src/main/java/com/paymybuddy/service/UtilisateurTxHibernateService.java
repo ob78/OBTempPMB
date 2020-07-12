@@ -293,17 +293,19 @@ public class UtilisateurTxHibernateService {
 					logger.error("Add a connection : Connection {} does not exist", connectionEmail);
 
 				} else {
-					Set<Utilisateur> utilisateurConnections = new HashSet<>();
-					utilisateurConnections = utilisateurToAddConnection.getConnection();
+					Set<Utilisateur> utilisateurConnections = utilisateurToAddConnection.getConnection();
 
 					// We check that the utilisateur and the new connection are not already
 					// connected
-					if (utilisateurConnections.contains(newConnection)) {
+					if (utilisateurConnections!=null && utilisateurConnections.contains(newConnection)) {
 						logger.error("Add a conection : Utilisateur {} has already Connection {}", utilisateurEmail,
 								connectionEmail);
 
 					// If all is ok, then we add the new connection to the utilisateur :
 					} else {
+						if (utilisateurConnections==null) {
+							utilisateurConnections = new HashSet<>();
+						}
 						utilisateurConnections.add(newConnection);
 						utilisateurToAddConnection.setConnection(utilisateurConnections);
 						utilisateurRepository.addConnection(utilisateurToAddConnection, newConnection);
