@@ -53,6 +53,7 @@ public class TransactionTxHibernateService {
 			// transactions is registered in the application
 			if (utilisateurRepository.read(utilisateurEmail) == null) {
 				logger.error("Get all transactions : Utilisateur {} does not exist", utilisateurEmail);
+
 			} else {
 				transactions = transactionRepository.getTransactions(utilisateurEmail);
 
@@ -110,8 +111,8 @@ public class TransactionTxHibernateService {
 				if (utilisateur == null) {
 					logger.error("Make a transaction : Utilisateur initiateur {} does not exist", initiateurEmail);
 
-					// We check that the contrepartie of the transaction is registered in the
-					// application
+				// We check that the contrepartie of the transaction is registered in the
+				// application
 				} else if (connection == null) {
 					logger.error("Make a transaction : Utilisateur contrepartie {} does not exist", contrepartieEmail);
 
@@ -126,7 +127,7 @@ public class TransactionTxHibernateService {
 								contrepartieEmail);
 
 					// We check that the initiateur of the transaction has a sufficient solde
-					// compared to the amount of the transaction
+					// compared to the amount of the transaction in order to perform the transaction
 					} else if (utilisateur.getSolde() < montant) {
 						logger.error(
 								"Make a transaction : Utilisateur {} solde = {} not sufficient for transaction amount = {}",
@@ -134,11 +135,13 @@ public class TransactionTxHibernateService {
 
 					// If all is ok we perform the transaction :
 					} else {
-						// The solde of the initiateur is reduce from the amount of the transaction
+						// The solde of the initiateur is decreased from the amount of the transaction
 						utilisateur.setSolde(utilisateur.getSolde() - montant);
 
-						// The connection get the amount of the transaction minus the commission of 0.5%
+						// The solde of the connection is increased by the amount of the transaction
+						// minus the commission of 0.5%
 						connection.setSolde(connection.getSolde() + montant * (1 - 0.005));
+
 						utilisateurRepository.update(utilisateur);
 						utilisateurRepository.update(connection);
 
@@ -153,7 +156,7 @@ public class TransactionTxHibernateService {
 						repositoryTxManager.commitTx();
 
 						logger.info(
-								"Transaction made by Utilisateur intitiateur {} to Utilisateur contrepartie {} for amount = {} : done",
+								"Transaction made by Utilisateur initiateur {} to Utilisateur contrepartie {} for amount = {} : done",
 								initiateurEmail, contrepartieEmail, montant);
 
 						transactionDone = true;

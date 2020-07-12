@@ -29,7 +29,7 @@ public class UtilisateurTxHibernateService {
 	}
 
 	/**
-	 * Method managing the registration on an user to the application.
+	 * Method managing the registration of a user to the application.
 	 * 
 	 * @param utilisateurEmail The email of the user to register
 	 * 
@@ -45,13 +45,13 @@ public class UtilisateurTxHibernateService {
 		try {
 			repositoryTxManager.openCurrentSessionWithTx();
 
-			// We check that the Utilisateur with this email address is not already
+			// We check that the utilisateur with this email address is not already
 			// registered in the application
 			if (utilisateurRepository.read(utilisateurEmail) != null) {
 				logger.error("Registration : Utilisateur {} already exist", utilisateurEmail);
 
 			} else {
-				// We create the Utilisateur and save it in the database in order to register it
+				// We create the utilisateur and save it in the database in order to register it
 				// in the application
 				Utilisateur utilisateurToCreate = new Utilisateur();
 				utilisateurToCreate.setEmail(utilisateurEmail);
@@ -96,16 +96,16 @@ public class UtilisateurTxHibernateService {
 		try {
 			repositoryTxManager.openCurrentSessionWithTx();
 
-			// We check that the Utilisateur with this email address is registered in the
+			// We check that the utilisateur with this email address is registered in the
 			// application
 			if (utilisateurRepository.read(utilisateurEmail) == null) {
 				logger.error("Connection : Utilisateur {} does not exist", utilisateurEmail);
 
-				// We check that the password is correct
+			// We check that the password is correct
 			} else if (!utilisateurRepository.read(utilisateurEmail).getPassword().equals(password)) {
 				logger.error("Connection : Utilisateur {} wrong password", utilisateurEmail);
 
-				// If all is ok then the Utilisateur is connected to the application
+			// If all is ok then the utilisateur is connected to the application
 			} else {
 				repositoryTxManager.commitTx();
 
@@ -140,7 +140,7 @@ public class UtilisateurTxHibernateService {
 
 		boolean wireToAccountDone = false;
 
-		// We check that the transaction amount is positive
+		// We check that the amount to be wired is positive
 		if (montant <= 0) {
 			logger.error("Wire to account : Utilisateur {}, amount = {} must be positive", utilisateurEmail, montant);
 		} else {
@@ -150,13 +150,13 @@ public class UtilisateurTxHibernateService {
 
 				Utilisateur utilisateurToUpdate = utilisateurRepository.read(utilisateurEmail);
 
-				// We check that the Utilisateur with this email address is registered in the
+				// We check that the utilisateur with this email address is registered in the
 				// application
 				if (utilisateurToUpdate == null) {
 					logger.error("Wire to account : Utilisateur {} does not exist", utilisateurEmail);
 				} else {
 
-					// If all is ok, we update the Utilisateur with a new Solde being the old one
+					// If all is ok, we update the utilisateur with a new solde being the old one
 					// plus the amount wired
 					Double oldSolde = utilisateurToUpdate.getSolde();
 					Double newSolde = oldSolde + montant;
@@ -199,7 +199,7 @@ public class UtilisateurTxHibernateService {
 
 		boolean withdrawalFromAccountDone = false;
 
-		// We check that the transaction amount is positive
+		// We check that the amount to be withdrawn is positive
 		if (montant <= 0) {
 			logger.error("Withdrawal from account : Utilisateur {}, amount = {} must be positive", utilisateurEmail,
 					montant);
@@ -210,7 +210,7 @@ public class UtilisateurTxHibernateService {
 
 				Utilisateur utilisateurToUpdate = utilisateurRepository.read(utilisateurEmail);
 
-				// We check that the Utilisateur with this email address is registered in the
+				// We check that the utilisateur with this email address is registered in the
 				// application
 				if (utilisateurToUpdate == null) {
 					logger.error("Withdrawal from account : Utilisateur {} does not exist", utilisateurEmail);
@@ -218,17 +218,17 @@ public class UtilisateurTxHibernateService {
 
 					Double oldSolde = utilisateurToUpdate.getSolde();
 
-					// We check that the Solde of the Utilisateur is sufficient to perform the
+					// We check that the solde of the Utilisateur is sufficient to perform the
 					// withdrawal
 					if (oldSolde < montant) {
 						logger.error(
 								"Withdrawal from account : Utilisateur {} solde = {} not sufficient for amount = {}",
 								utilisateurEmail, oldSolde, montant);
 					} else {
+						// If all is ok, we update the utilisateur with a new solde being the old one
+						// minus the amount withdrawn
 						Double newSolde = oldSolde - montant;
 
-						// If all is ok, we update the Utilisateur with a new Solde being the old one
-						// minus the amount withdrawn
 						utilisateurToUpdate.setSolde(newSolde);
 
 						utilisateurRepository.update(utilisateurToUpdate);
@@ -271,7 +271,7 @@ public class UtilisateurTxHibernateService {
 
 		boolean connectionAdded = false;
 
-		// We check that the initiateur and the contrepartie of the transaction are not
+		// We check that the utilisateur and the connection to add are not
 		// the same
 		if (utilisateurEmail.equals(connectionEmail)) {
 			logger.error("Add a connection : Utilisateur {} same as connection to add", utilisateurEmail);
@@ -283,12 +283,12 @@ public class UtilisateurTxHibernateService {
 				Utilisateur utilisateurToAddConnection = utilisateurRepository.read(utilisateurEmail);
 				Utilisateur newConnection = utilisateurRepository.read(connectionEmail);
 
-				// We check that the Utilisateur to which add a connection is registered in the
+				// We check that the utilisateur to which add a connection is registered in the
 				// application
 				if (utilisateurToAddConnection == null) {
 					logger.error("Add a connection : Utilisateur {} does not exist", utilisateurEmail);
 
-				// We check that the new Connection is registered in the application
+				// We check that the new connection is registered in the application
 				} else if (newConnection == null) {
 					logger.error("Add a connection : Connection {} does not exist", connectionEmail);
 
@@ -296,13 +296,13 @@ public class UtilisateurTxHibernateService {
 					Set<Utilisateur> utilisateurConnections = new HashSet<>();
 					utilisateurConnections = utilisateurToAddConnection.getConnection();
 
-					// We check that the initiateur and the contrepartie of the transaction are not
-					// already connected
+					// We check that the utilisateur and the new connection are not already
+					// connected
 					if (utilisateurConnections.contains(newConnection)) {
 						logger.error("Add a conection : Utilisateur {} has already Connection {}", utilisateurEmail,
 								connectionEmail);
-					
-					// If all is ok, then we add the new Connection to the utilisateur
+
+					// If all is ok, then we add the new connection to the utilisateur :
 					} else {
 						utilisateurConnections.add(newConnection);
 						utilisateurToAddConnection.setConnection(utilisateurConnections);
