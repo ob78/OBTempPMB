@@ -1,5 +1,9 @@
 package com.paymybuddy.configuration;
 
+import java.sql.SQLException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
 /**
@@ -7,6 +11,10 @@ import org.springframework.jdbc.datasource.DriverManagerDataSource;
  * objects for interaction with the database
  */
 public class RepositoryDataSource {
+
+	private static final Logger logger = LoggerFactory.getLogger(RepositoryDataSource.class);
+
+	private static DriverManagerDataSource dataSource = null;
 
 	/**
 	 * Create a DriverManager DataSource for the database.
@@ -24,7 +32,7 @@ public class RepositoryDataSource {
 	public static DriverManagerDataSource getDataSource(String driverClassName, String url, String username,
 			String password) {
 
-		DriverManagerDataSource dataSource = new DriverManagerDataSource();
+		dataSource = new DriverManagerDataSource();
 
 		dataSource.setDriverClassName(driverClassName);
 		dataSource.setUrl(url);
@@ -34,4 +42,14 @@ public class RepositoryDataSource {
 		return dataSource;
 	}
 
+	/**
+	 * Close the DriverManager DataSource.
+	 */
+	public static void closeDatasource() {
+		try {
+			dataSource.getConnection().close();
+		} catch (SQLException e) {
+			logger.error("Error during close of datasource", e);
+		}
+	}
 }

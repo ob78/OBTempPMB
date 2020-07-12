@@ -90,6 +90,7 @@ public class RepositoryTxManagerHibernate {
 	 */
 	public void closeCurrentSession() {
 		currentSession.close();
+		logger.info("Session closed");
 	}
 
 	/**
@@ -98,6 +99,7 @@ public class RepositoryTxManagerHibernate {
 	public void commitTxAndCloseCurrentSession() {
 		currentTx.commit();
 		currentSession.close();
+		logger.info("Session with Tx closed");
 	}
 
 	/**

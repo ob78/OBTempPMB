@@ -50,6 +50,9 @@ public class TransactionRepositoryJpaTxHibernateImplITest {
 		// We get a resourceDatabasePopulator
 		resourceDatabasePopulator = new ResourceDatabasePopulator();
 		resourceDatabasePopulator.addScript(new ClassPathResource("/dataTransactionsForTests.sql"));
+
+		// We close the dataSource
+		RepositoryDataSource.closeDatasource();
 	}
 
 	@BeforeEach
@@ -70,6 +73,7 @@ public class TransactionRepositoryJpaTxHibernateImplITest {
 	private void afterPerTest() {
 
 		repositoryTxManager.closeCurrentSession();
+
 	}
 
 	@Test

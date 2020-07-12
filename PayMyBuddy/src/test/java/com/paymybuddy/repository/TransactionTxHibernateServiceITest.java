@@ -25,8 +25,8 @@ import com.paymybuddy.repositorytxmanager.RepositoryTxManagerHibernate;
 import com.paymybuddy.service.TransactionTxHibernateService;
 
 /**
- * Class including integration tests (with the database) for the
- * TransactionTxHibernateService Class.
+ * Class including integration tests for the TransactionTxHibernateService
+ * Class.
  */
 public class TransactionTxHibernateServiceITest {
 
@@ -53,6 +53,9 @@ public class TransactionTxHibernateServiceITest {
 		// We get a resourceDatabasePopulator
 		resourceDatabasePopulator = new ResourceDatabasePopulator();
 		resourceDatabasePopulator.addScript(new ClassPathResource("/dataTransactionsForTests.sql"));
+
+		// We close the dataSource
+		RepositoryDataSource.closeDatasource();
 	}
 
 	@BeforeEach
@@ -158,7 +161,7 @@ public class TransactionTxHibernateServiceITest {
 	}
 
 	@Test
-	public void makeATransactionWhenInitiateurAndContrepartieExistAndAreConnectedAndSoldeSufficient() {
+	public void makeATransactionWhenAmountIsPositiveAndInitiateurAndContrepartieExistAndAreConnectedAndSoldeSufficient() {
 		// ARRANGE
 		repositoryTxManager.openCurrentSessionWithTx();
 		Utilisateur initiateurBeforeNewTransaction = utilisateurRepositoryImpl.read("abc@test.com");
@@ -199,6 +202,40 @@ public class TransactionTxHibernateServiceITest {
 	}
 
 	@Test
+	public void makeATransactionWhenAmountIsNegative() {
+		// ARRANGE
+		repositoryTxManager.openCurrentSessionWithTx();
+		Utilisateur initiateurBeforeNewTransaction = utilisateurRepositoryImpl.read("abc@test.com");
+		Utilisateur contrepartieBeforeNewTransaction = utilisateurRepositoryImpl.read("def@test.com");
+		repositoryTxManager.commitTxAndCloseCurrentSession();
+
+		List<Transaction> listTransactionsBeforeNewTransaction = new ArrayList<>();
+		listTransactionsBeforeNewTransaction = transactionTxHibernateServiceUnderTest.getTransactions("abc@test.com");
+
+		// ACT
+		boolean result = transactionTxHibernateServiceUnderTest.makeATransaction(
+				initiateurBeforeNewTransaction.getEmail(), contrepartieBeforeNewTransaction.getEmail(), -10d);
+
+		// ASSERT
+		assertFalse(result);
+
+		repositoryTxManager.openCurrentSessionWithTx();
+		Utilisateur initiateurAfterNewTransaction = utilisateurRepositoryImpl.read("abc@test.com");
+		Utilisateur contrepartieAfterNewTransaction = utilisateurRepositoryImpl.read("def@test.com");
+		repositoryTxManager.commitTxAndCloseCurrentSession();
+
+		assertEquals((double) (initiateurBeforeNewTransaction.getSolde()),
+				(double) (initiateurAfterNewTransaction.getSolde()));
+		assertEquals((double) (contrepartieBeforeNewTransaction.getSolde()),
+				(double) (contrepartieAfterNewTransaction.getSolde()));
+
+		List<Transaction> listTransactionsAfterNewTransaction = new ArrayList<>();
+		listTransactionsAfterNewTransaction = transactionTxHibernateServiceUnderTest.getTransactions("abc@test.com");
+
+		assertEquals(listTransactionsBeforeNewTransaction.size(), listTransactionsAfterNewTransaction.size());
+	}
+
+	@Test
 	public void makeATransactionWhenInitiateurNotExist() {
 		// ARRANGE
 		repositoryTxManager.openCurrentSessionWithTx();
@@ -220,7 +257,7 @@ public class TransactionTxHibernateServiceITest {
 	}
 
 	@Test
-	public void makeATransactionWhenContrepartieNotExist() {
+	public void makeATransactionWhenInitiateurExistContrepartieNotExist() {
 		// ARRANGE
 		repositoryTxManager.openCurrentSessionWithTx();
 		Utilisateur initiateurBeforeNewTransaction = utilisateurRepositoryImpl.read("abc@test.com");
