@@ -1,6 +1,8 @@
 package com.paymybuddy.repositorytxmanager;
 
 import java.io.File;
+import java.sql.Connection;
+import java.util.Properties;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -8,6 +10,8 @@ import org.hibernate.Transaction;
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+import org.hibernate.cfg.Configuration;
+import org.hibernate.cfg.Environment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,26 +26,26 @@ public class RepositoryTxManagerHibernate {
 
 	private Transaction currentTx;
 
-	private String hibernateConfigurationFile;
+	private String paymybuddyPropertiesFile;
 
 	private static RepositoryTxManagerHibernate repositoryTxManagerHibernate = null;
 
-	private RepositoryTxManagerHibernate(String configFile) {
-		this.hibernateConfigurationFile = configFile;
+	private RepositoryTxManagerHibernate(String paymybuddyPropertiesFile) {
+		this.paymybuddyPropertiesFile = paymybuddyPropertiesFile;
 	}
 
 	/**
 	 * Create an instance of RepositoryTxManagerHibernate, if not already exist.
 	 * 
-	 * @param configurationFile The path of the Hibernate configuration file
+	 * @param paymybuddyPropertiesFile The path of the paymybuddy properties file
 	 * 
 	 * @return The RepositoryTxManagerHibernate
 	 */
-	public static RepositoryTxManagerHibernate getRepositoryTxManagerHibernate(String configurationFile) {
+	public static RepositoryTxManagerHibernate getRepositoryTxManagerHibernate(String paymybuddyPropertiesFile) {
 
 		if (repositoryTxManagerHibernate == null) {
 
-			repositoryTxManagerHibernate = new RepositoryTxManagerHibernate(configurationFile);
+			repositoryTxManagerHibernate = new RepositoryTxManagerHibernate(paymybuddyPropertiesFile);
 
 			logger.info("Creation of Tx Hibernate manager : OK");
 		}
@@ -49,21 +53,51 @@ public class RepositoryTxManagerHibernate {
 		return repositoryTxManagerHibernate;
 	}
 
-	// private static SessionFactory getSessionFactory() {
 	/**
 	 * Create an instance of Hibernate SessionFactory.
 	 * 
-	 * @param configurationFile The path of the Hibernate configuration file
+	 * @param configurationFile The path of the paymybuddy properties file
 	 * 
 	 * @return The SessionFactory
 	 */
 	private SessionFactory getSessionFactory() {
 
-		File configFile = new File(hibernateConfigurationFile);
+		Properties paymybuddyProperties = new Properties();
+		try {
+			paymybuddyProperties.load(ClassLoader.getSystemClassLoader().getResourceAsStream(paymybuddyPropertiesFile));
+		} catch (Exception e) {
+			logger.error("Error during load of paymybuddy properties file", e);
+		}
+		paymybuddyProperties.put(Environment.SHOW_SQL, "true");
+		paymybuddyProperties.put(Environment.FORMAT_SQL, "true");
+		paymybuddyProperties.put(Environment.DRIVER, "org.postgresql.Driver");
+		paymybuddyProperties.put(Environment.HBM2DDL_AUTO, "none");
+		paymybuddyProperties.put(Environment.DIALECT, "org.hibernate.dialect.PostgreSQLDialect");
+		paymybuddyProperties.put(Environment.CURRENT_SESSION_CONTEXT_CLASS, "thread");
+		paymybuddyProperties.put(Environment.C3P0_MAX_SIZE, "300");
+		paymybuddyProperties.put(Environment.POOL_SIZE, "300");
 
-		final StandardServiceRegistry registry = new StandardServiceRegistryBuilder().configure(configFile).build();
+		/*
+		 * File configFile = new File(hibernateConfigurationFile);
+		 * 
+		 * final StandardServiceRegistry registry = new
+		 * StandardServiceRegistryBuilder().configure(configFile).build();
+		 * 
+		 * SessionFactory sessionFactory = new
+		 * MetadataSources(registry).buildMetadata().buildSessionFactory();
+		 */
 
-		SessionFactory sessionFactory = new MetadataSources(registry).buildMetadata().buildSessionFactory();
+		Configuration configuration = new Configuration().setProperties(paymybuddyProperties);
+		// .addClass(com.paymybuddy.entities.Transaction.class)
+		// .addClass(com.paymybuddy.entities.Utilisateur.class)
+		// .setProperties(dbConnectionProperties);
+		// .configure(hibernateConfigurationFile);
+
+		// SessionFactory sessionFactory = new
+		// Configuration().mergeProperties(dbConnectionProperties).configure("src/test/resources/hibernate.cfg.xml").buildSessionFactory();
+
+		SessionFactory sessionFactory = configuration.addAnnotatedClass(com.paymybuddy.entities.Transaction.class)
+				.addAnnotatedClass(com.paymybuddy.entities.Utilisateur.class).buildSessionFactory();
 
 		return sessionFactory;
 	}

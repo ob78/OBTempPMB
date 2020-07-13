@@ -29,7 +29,7 @@ import com.paymybuddy.repositorytxmanager.RepositoryTxManagerHibernate;
  */
 public class TransactionRepositoryJpaTxHibernateImplITest {
 
-	private static String hibernateConfigFile = "src/test/resources/hibernateTest.cfg.xml";
+	private static String paymybuddyPropertiesFile = "paymybuddyTest.properties";
 
 	private static RepositoryTxManagerHibernate repositoryTxManager;
 
@@ -60,7 +60,7 @@ public class TransactionRepositoryJpaTxHibernateImplITest {
 		// We prepare the database
 		DatabasePopulatorUtils.execute(resourceDatabasePopulator, dataSource);
 
-		repositoryTxManager = RepositoryTxManagerHibernate.getRepositoryTxManagerHibernate(hibernateConfigFile);
+		repositoryTxManager = RepositoryTxManagerHibernate.getRepositoryTxManagerHibernate(paymybuddyPropertiesFile);
 
 		transactionRepositoryImplUnderTest = RepositoryFactory.getTransactionRepository(repositoryTxManager);
 

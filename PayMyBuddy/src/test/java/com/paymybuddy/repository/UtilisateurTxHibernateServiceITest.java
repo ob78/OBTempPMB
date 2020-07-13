@@ -28,7 +28,7 @@ import com.paymybuddy.service.UtilisateurTxHibernateService;
  */
 public class UtilisateurTxHibernateServiceITest {
 
-	private static String hibernateConfigFile = "src/test/resources/hibernateTest.cfg.xml";
+	private static String paymybuddyPropertiesFile = "paymybuddyTest.properties";
 
 	private static ResourceDatabasePopulator resourceDatabasePopulator;
 
@@ -59,7 +59,7 @@ public class UtilisateurTxHibernateServiceITest {
 		// We clear the database
 		DatabasePopulatorUtils.execute(resourceDatabasePopulator, dataSource);
 
-		repositoryTxManager = RepositoryTxManagerHibernate.getRepositoryTxManagerHibernate(hibernateConfigFile);
+		repositoryTxManager = RepositoryTxManagerHibernate.getRepositoryTxManagerHibernate(paymybuddyPropertiesFile);
 
 		utilisateurRepositoryImpl = RepositoryFactory.getUtilisateurRepository(repositoryTxManager);
 

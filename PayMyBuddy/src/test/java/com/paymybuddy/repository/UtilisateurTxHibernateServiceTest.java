@@ -29,7 +29,7 @@ import com.paymybuddy.service.UtilisateurTxHibernateService;
 @ExtendWith(MockitoExtension.class)
 public class UtilisateurTxHibernateServiceTest {
 
-	private static String hibernateConfigFile = "src/test/resources/hibernateTest.cfg.xml";
+	private static String paymybuddyPropertiesFile = "paymybuddyTest.properties";
 
 	private RepositoryTxManagerHibernate repositoryTxManager;
 
@@ -41,7 +41,7 @@ public class UtilisateurTxHibernateServiceTest {
 	@BeforeEach
 	private void setUpPerTest() {
 		// We clear the database
-		repositoryTxManager = RepositoryTxManagerHibernate.getRepositoryTxManagerHibernate(hibernateConfigFile);
+		repositoryTxManager = RepositoryTxManagerHibernate.getRepositoryTxManagerHibernate(paymybuddyPropertiesFile);
 
 		utilisateurTxHibernateServiceUnderTest = ServiceFactory.getUtilisateurService(repositoryTxManager,
 				utilisateurRepositoryMock);
