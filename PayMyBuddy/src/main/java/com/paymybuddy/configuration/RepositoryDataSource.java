@@ -1,6 +1,10 @@
 package com.paymybuddy.configuration;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.SQLException;
+import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,25 +20,40 @@ public class RepositoryDataSource {
 
 	private static DriverManagerDataSource dataSource = null;
 
+	private static Properties properties = null;
+
+	private static InputStream input = null;
+
+	private static String paymybuddyPropertiesFilePath = null;
+
 	/**
 	 * Create a DriverManager DataSource for the database.
 	 * 
-	 * @param driverClassName The name of the driver class of the database
-	 * 
-	 * @param url             The url of the database
-	 * 
-	 * @param url             The username for the connection to the database
-	 * 
-	 * @param password        The password for the connection to the database
+	 * @param paymybuddyPropertiesFile The paymybuddy properties file
 	 * 
 	 * @return The DriverManagerDataSource
 	 */
-	public static DriverManagerDataSource getDataSource(String driverClassName, String url, String username,
-			String password) {
+	public static DriverManagerDataSource getDataSource(String paymybuddyPropertiesFile) {
+
+		paymybuddyPropertiesFilePath = "src/test/resources/" + paymybuddyPropertiesFile;
+
+		properties = new Properties();
+
+		try {
+			input = new FileInputStream(paymybuddyPropertiesFilePath);
+			properties.load(input);
+		} catch (IOException ex) {
+			logger.error("Error in loading paymybuddy.properties file", ex);
+		}
+
+		String driver = properties.getProperty("hibernate.connection.driver_class");
+		String url = properties.getProperty("hibernate.connection.url");
+		String username = properties.getProperty("hibernate.connection.username");
+		String password = properties.getProperty("hibernate.connection.password");
 
 		dataSource = new DriverManagerDataSource();
 
-		dataSource.setDriverClassName(driverClassName);
+		dataSource.setDriverClassName(driver);
 		dataSource.setUrl(url);
 		dataSource.setUsername(username);
 		dataSource.setPassword(password);

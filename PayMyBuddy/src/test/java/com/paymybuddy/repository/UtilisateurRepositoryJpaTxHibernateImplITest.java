@@ -40,8 +40,7 @@ public class UtilisateurRepositoryJpaTxHibernateImplITest {
 	@BeforeAll
 	private static void setUpAllTest() {
 		// We get a dataSource
-		dataSource = RepositoryDataSource.getDataSource("org.postgresql.Driver",
-				"jdbc:postgresql://localhost/PayMyBuddyTest", "postgres", "admin");
+		dataSource = RepositoryDataSource.getDataSource(paymybuddyPropertiesFile);
 
 		// We get a resourceDatabasePopulator
 		resourceDatabasePopulator = new ResourceDatabasePopulator();

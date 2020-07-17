@@ -29,7 +29,10 @@ public class RepositoryTxManagerHibernate {
 	private String paymybuddyPropertiesFile;
 
 	private static RepositoryTxManagerHibernate repositoryTxManagerHibernate = null;
-
+/*
+	private RepositoryTxManagerHibernate() {
+	}
+*/
 	private RepositoryTxManagerHibernate(String paymybuddyPropertiesFile) {
 		this.paymybuddyPropertiesFile = paymybuddyPropertiesFile;
 	}
@@ -44,7 +47,11 @@ public class RepositoryTxManagerHibernate {
 	public static RepositoryTxManagerHibernate getRepositoryTxManagerHibernate(String paymybuddyPropertiesFile) {
 
 		if (repositoryTxManagerHibernate == null) {
-
+/*
+			paymybuddyPropertiesFile=paymybuddyProperties;
+			
+			repositoryTxManagerHibernate = new RepositoryTxManagerHibernate();
+*/
 			repositoryTxManagerHibernate = new RepositoryTxManagerHibernate(paymybuddyPropertiesFile);
 
 			logger.info("Creation of Tx Hibernate manager : OK");
@@ -68,15 +75,24 @@ public class RepositoryTxManagerHibernate {
 		} catch (Exception e) {
 			logger.error("Error during load of paymybuddy properties file", e);
 		}
+		//paymybuddyProperties.put(Environment.DRIVER, "org.postgresql.Driver");
 		paymybuddyProperties.put(Environment.SHOW_SQL, "true");
 		paymybuddyProperties.put(Environment.FORMAT_SQL, "true");
-		paymybuddyProperties.put(Environment.DRIVER, "org.postgresql.Driver");
 		paymybuddyProperties.put(Environment.HBM2DDL_AUTO, "none");
 		paymybuddyProperties.put(Environment.DIALECT, "org.hibernate.dialect.PostgreSQLDialect");
 		paymybuddyProperties.put(Environment.CURRENT_SESSION_CONTEXT_CLASS, "thread");
 		paymybuddyProperties.put(Environment.C3P0_MAX_SIZE, "300");
 		paymybuddyProperties.put(Environment.POOL_SIZE, "300");
 
+		//paymybuddyProperties.put(Environment.RELEASE_CONNECTIONS, "thread");
+		/*
+		paymybuddyProperties.put(Environment.C3P0_MIN_SIZE, "5");
+		paymybuddyProperties.put(Environment.C3P0_MAX_SIZE, "100");
+		paymybuddyProperties.put(Environment.C3P0_TIMEOUT, "300");
+		*/
+		//paymybuddyProperties.put(Environment.POOL_SIZE, "300");
+		
+		
 		/*
 		 * File configFile = new File(hibernateConfigurationFile);
 		 * 

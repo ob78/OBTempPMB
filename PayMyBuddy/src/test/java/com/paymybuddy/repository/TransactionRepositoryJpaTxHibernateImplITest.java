@@ -4,9 +4,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Properties;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -40,12 +44,11 @@ public class TransactionRepositoryJpaTxHibernateImplITest {
 	private ITransactionRepository transactionRepositoryImplUnderTest;
 
 	private IUtilisateurRepository utilisateurRepositoryImp;
-
+	
 	@BeforeAll
 	private static void setUpAllTest() {
 		// We get a dataSource
-		dataSource = RepositoryDataSource.getDataSource("org.postgresql.Driver",
-				"jdbc:postgresql://localhost/PayMyBuddyTest", "postgres", "admin");
+		dataSource = RepositoryDataSource.getDataSource(paymybuddyPropertiesFile);
 
 		// We get a resourceDatabasePopulator
 		resourceDatabasePopulator = new ResourceDatabasePopulator();
